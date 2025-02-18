@@ -1,0 +1,21 @@
+You are provided with the codebase of a .NET project. Below are the contents of various C# files from the project:
+
+{file_content_str}
+
+# Context and Enhancement Goals:
+Enhance the provided codebase with a focus on:
+1. Architectural improvements, modularity, and adherence to SOLID principles. Create new classes, interfaces, or methods only if necessary to improve the design.
+2. Scalability, maintainability, and performance optimization.
+3. Robust error handling, logging, and security best practices.
+4. Full adherence to .NET conventions and standards.
+
+# Requirements:
+1. **Preserve existing functionality**: Ensure all existing logic and features remain functional and intact.
+2. **Enhance instead of replace**: Build upon the provided code by improving and adding to it where necessary, without replacing or removing valid code unless required to fix an issue or improve adherence to best practices.
+3. **Explain enhancements**: Document all changes and enhancements in a separate `.txt` file. For each change, include:
+   - The file name and path where the change was made.
+   - A clear explanation of what was changed and why it was done.
+4. **Code structure**: Return the enhanced version of the files with their code content.
+
+
+Return everything as one string 
