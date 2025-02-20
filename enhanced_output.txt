@@ -1,0 +1,116 @@
+```csharp
+===== Program.cs (/workspaces/CodeVision1/StudentData/Program.cs) =====
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Welcome to the Better Student Management System!");
+
+        StudentManager studentManager = new StudentManager();
+
+        while (true)
+        {
+            Console.WriteLine("1. Add Student");
+            Console.WriteLine("2. Show All Students");
+            Console.WriteLine("3. Find Student by Name");
+            Console.WriteLine("4. Calculate Average Grade");
+            Console.WriteLine("5. Exit");
+            Console.Write("Enter choice: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    studentManager.AddStudent();
+                    break;
+                case "2":
+                    studentManager.ShowAllStudents();
+                    break;
+                case "3":
+                    studentManager.FindStudentByName();
+                    break;
+                case "4":
+                    studentManager.CalculateAverageGrade();
+                    break;
+                case "5":
+                    Console.WriteLine("Goodbye!");
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Try again.");
+                    break;
+            }
+
+            if (choice == "5")
+            {
+                break;
+            }
+        }
+    }
+}
+
+class StudentManager
+{
+    private List<string> students = new List<string>();
+    private List<int> ages = new List<int>();
+    private List<double> grades = new List<double>();
+
+    public void AddStudent()
+    {
+        Console.Write("Enter student name: ");
+        string name = Console.ReadLine();
+        students.Add(name);
+
+        Console.Write("Enter age: ");
+        int age = Convert.ToInt32(Console.ReadLine());
+        ages.Add(age);
+
+        Console.Write("Enter grade: ");
+        double grade = Convert.ToDouble(Console.ReadLine());
+        grades.Add(grade);
+
+        Console.WriteLine("Student added successfully!");
+    }
+
+    public void ShowAllStudents()
+    {
+        Console.WriteLine("List of Students:");
+        for (int i = 0; i < students.Count; i++)
+        {
+            Console.WriteLine("Name: " + students[i] + ", Age: " + ages[i] + ", Grade: " + grades[i]);
+        }
+    }
+
+    public void FindStudentByName()
+    {
+        Console.Write("Enter student name to search: ");
+        string searchName = Console.ReadLine();
+        bool found = false;
+        for (int i = 0; i < students.Count; i++)
+        {
+            if (students[i] == searchName)
+            {
+                Console.WriteLine("Found: " + students[i] + " Age: " + ages[i] + " Grade: " + grades[i]);
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            Console.WriteLine("Student not found!");
+        }
+    }
+
+    public void CalculateAverageGrade()
+    {
+        double sum = 0;
+        for (int i = 0; i < grades.Count; i++)
+        {
+            sum += grades[i];
+        }
+        Console.WriteLine("Average Grade: " + (sum / grades.Count));
+    }
+}
+```
