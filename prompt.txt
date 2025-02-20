@@ -1,21 +1,34 @@
+Prompt to enhance a specific file in a .NET project, considering the context of the entire project:
+
 You are provided with the codebase of a .NET project. Below are the contents of various C# files from the project:
 
 {file_content_str}
 
-# Context and Enhancement Goals:
-Enhance the provided codebase with a focus on:
-1. Architectural improvements, modularity, and adherence to SOLID principles. Create new classes, interfaces, or methods only if necessary to improve the design.
-2. Scalability, maintainability, and performance optimization.
-3. Robust error handling, logging, and security best practices.
-4. Full adherence to .NET conventions and standards.
+Context and Enhancement Goals:
+Enhance the specified file with the following goals, considering the context of the entire project:
 
-# Requirements:
-1. **Preserve existing functionality**: Ensure all existing logic and features remain functional and intact.
-2. **Enhance instead of replace**: Build upon the provided code by improving and adding to it where necessary, without replacing or removing valid code unless required to fix an issue or improve adherence to best practices.
-3. **Explain enhancements**: Document all changes and enhancements in a separate `.txt` file. For each change, include:
-   - The file name and path where the change was made.
-   - A clear explanation of what was changed and why it was done.
-4. **Code structure**: Return the enhanced version of the files with their code content.
+Architectural Improvements: Refactor the file based on the overall architecture of the project, following SOLID principles. Ensure that the file fits well within the larger project design.
+Modularity & Reusability: Ensure that any new additions or modifications to this file adhere to the principles of modularity and reusability, aligning with the overall project structure.
+Scalability and Performance: Make necessary changes to improve the scalability and performance of the file, considering how it interacts with other files and components in the project.
+Error Handling and Logging: Integrate robust error handling and logging practices from other parts of the project, ensuring consistency across the codebase.
+Security Best Practices: Implement any relevant security practices based on the project's overall security standards.
+Code Conventions: Ensure the code adheres to .NET conventions and best practices, consistent with the rest of the project.
+Requirements:
+File to Modify: The file you will be modifying is Logger.cs.
 
+Preserve Existing Functionality: Ensure the functionality of the specific file being modified remains intact, without breaking existing behavior in the project.
 
-Return everything as one string 
+Enhancement: Only add enhancements to the file. If refactoring or changes are required, ensure they are in line with the overall project context.
+
+Integration with Project: Consider how the file you are enhancing integrates with other parts of the project. Any changes should align with the overall architecture and goals of the project.
+
+Explanation of Changes: For each modification, provide:
+
+The file name and path where the change was made.
+A detailed explanation of what was changed and why it was necessary, considering the project context.
+Code Structure: Return the modified version of the specific file, along with a detailed explanation of each enhancement. Ensure the structure is aligned with the project.
+
+Return everything as one string, including:
+
+The enhanced content of the specified file.
+A clear and concise explanation of each change based on the project context.

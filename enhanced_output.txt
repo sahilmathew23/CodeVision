@@ -1,116 +1,65 @@
+### Enhanced Version of Logger.cs
+
 ```csharp
-===== Program.cs (/workspaces/CodeVision1/StudentData/Program.cs) =====
+// Path: /tmp/tmp1qzrk55t/GenAINumHandler/LoggingService/Logger.cs
 using System;
-using System.Collections.Generic;
+using System.IO;
 
-class Program
+namespace LoggingService
 {
-    static void Main(string[] args)
+    public class Logger : IDisposable
     {
-        Console.WriteLine("Welcome to the Better Student Management System!");
+        private StreamWriter writer;
 
-        StudentManager studentManager = new StudentManager();
-
-        while (true)
+        public Logger()
         {
-            Console.WriteLine("1. Add Student");
-            Console.WriteLine("2. Show All Students");
-            Console.WriteLine("3. Find Student by Name");
-            Console.WriteLine("4. Calculate Average Grade");
-            Console.WriteLine("5. Exit");
-            Console.Write("Enter choice: ");
-            string choice = Console.ReadLine();
+            // Ensures that log file resource is managed properly
+            writer = new StreamWriter("log.txt", append: true); // Appends to existing file to preserve logs
+        }
 
-            switch (choice)
+        public void LogMessage(string message)
+        {
+            try
             {
-                case "1":
-                    studentManager.AddStudent();
-                    break;
-                case "2":
-                    studentManager.ShowAllStudents();
-                    break;
-                case "3":
-                    studentManager.FindStudentByName();
-                    break;
-                case "4":
-                    studentManager.CalculateAverageGrade();
-                    break;
-                case "5":
-                    Console.WriteLine("Goodbye!");
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice. Try again.");
-                    break;
+                writer.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + " - " + message);
+                writer.Flush(); // Ensures all data is written to the file immediately
             }
-
-            if (choice == "5")
+            catch (Exception ex)
             {
-                break;
+                // Exception handling ensures robust logging without crashing the main application
+                Console.Error.WriteLine("Failed to log message: " + ex.Message);
             }
         }
-    }
-}
 
-class StudentManager
-{
-    private List<string> students = new List<string>();
-    private List<int> ages = new List<int>();
-    private List<double> grades = new List<double>();
-
-    public void AddStudent()
-    {
-        Console.Write("Enter student name: ");
-        string name = Console.ReadLine();
-        students.Add(name);
-
-        Console.Write("Enter age: ");
-        int age = Convert.ToInt32(Console.ReadLine());
-        ages.Add(age);
-
-        Console.Write("Enter grade: ");
-        double grade = Convert.ToDouble(Console.ReadLine());
-        grades.Add(grade);
-
-        Console.WriteLine("Student added successfully!");
-    }
-
-    public void ShowAllStudents()
-    {
-        Console.WriteLine("List of Students:");
-        for (int i = 0; i < students.Count; i++)
+        // Implement IDisposable to allow using statement usage which ensures the stream is closed properly
+        public void Dispose()
         {
-            Console.WriteLine("Name: " + students[i] + ", Age: " + ages[i] + ", Grade: " + grades[i]);
-        }
-    }
-
-    public void FindStudentByName()
-    {
-        Console.Write("Enter student name to search: ");
-        string searchName = Console.ReadLine();
-        bool found = false;
-        for (int i = 0; i < students.Count; i++)
-        {
-            if (students[i] == searchName)
+            if (writer != null)
             {
-                Console.WriteLine("Found: " + students[i] + " Age: " + ages[i] + " Grade: " + grades[i]);
-                found = true;
-                break;
+                writer.Close();
+                writer = null;
             }
         }
-        if (!found)
-        {
-            Console.WriteLine("Student not found!");
-        }
-    }
-
-    public void CalculateAverageGrade()
-    {
-        double sum = 0;
-        for (int i = 0; i < grades.Count; i++)
-        {
-            sum += grades[i];
-        }
-        Console.WriteLine("Average Grade: " + (sum / grades.Count));
     }
 }
 ```
+
+### Explanation of Changes
+
+1. **Improved File Resource Management**:
+    - Implemented the `IDisposable` interface and used a concept of a disposable pattern allowing the instance of `Logger` to be used with a `using` statement. This ensures that file resources are cleared up correctly after operations via the `Dispose` method, guarding against potential resource leaks.
+
+2. **Handling Append Mode and Real-time Writing**:
+    - Changed the `StreamWriter` instantiation to append to the log file (instead of overwriting). This preserves previous logs which is crucial for debugging historical issues.
+    - Added `Flush()` method after writing to ensure that data is written immediately to the file, which is important for observing real-time log outputs, especially critical in error scenarios.
+
+3. **Error Handling**:
+    - Ensured that any issues during the log writing process (like IO exceptions) are caught and handled without throwing exceptions to the main program. This prevents logging failures from impacting the main application's behavior.
+
+4. **Timestamps in Logs**:
+    - Added timestamps to each log entry, which is vital for debugging and tracking when specific events happen, improving the traceability and usefulness of the log data.
+
+5. **Adherence to .NET conventions**:
+    - Ensured the use of the `StreamWriter` followed best practices, such as immediate flush to file and proper disposal pattern.
+
+By enhancing the `Logger.cs` file in this manner, these changes ensure that the logging facility is more reliable, maintainable, and integrated into the project with higher performance and adherence to better design principles like SOLID and disposable pattern. Moving forward, the application can better handle and trace through its operational flows and unexpected errors.

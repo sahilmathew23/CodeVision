@@ -1,92 +1,87 @@
-===== Program.cs (/workspaces/CodeVision1/StudentData/Program.cs) =====
-using System;
-using System.Collections.Generic;
-
-class Program
+===== Logger.cs (/tmp/tmp1qzrk55t/GenAINumHandler/LoggingService/Logger.cs) =====
+﻿namespace LoggingService
 {
-    static void Main(string[] args)
-    {
-        Console.WriteLine("Welcome to the Bad Student Management System!");
-        
-        List<string> students = new List<string>();
-        List<int> ages = new List<int>();
-        List<double> grades = new List<double>();
-        
-        while (true)
-        {
-            Console.WriteLine("1. Add Student");
-            Console.WriteLine("2. Show All Students");
-            Console.WriteLine("3. Find Student by Name");
-            Console.WriteLine("4. Calculate Average Grade");
-            Console.WriteLine("5. Exit");
-            Console.Write("Enter choice: ");
-            string choice = Console.ReadLine();
-            
-            if (choice == "1")
-            {
-                Console.Write("Enter student name: ");
-                string name = Console.ReadLine();
-                students.Add(name);
-                
-                Console.Write("Enter age: ");
-                int age = Convert.ToInt32(Console.ReadLine());
-                ages.Add(age);
-                
-                Console.Write("Enter grade: ");
-                double grade = Convert.ToDouble(Console.ReadLine());
-                grades.Add(grade);
-                
-                Console.WriteLine("Student added successfully!");
-            }
-            else if (choice == "2")
-            {
-                Console.WriteLine("List of Students:");
-                for (int i = 0; i < students.Count; i++)
-                {
-                    Console.WriteLine("Name: " + students[i] + ", Age: " + ages[i] + ", Grade: " + grades[i]);
-                }
-            }
-            else if (choice == "3")
-            {
-                Console.Write("Enter student name to search: ");
-                string searchName = Console.ReadLine();
-                bool found = false;
-                for (int i = 0; i < students.Count; i++)
-                {
-                    if (students[i] == searchName)
-                    {
-                        Console.WriteLine("Found: " + students[i] + " Age: " + ages[i] + " Grade: " + grades[i]);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    Console.WriteLine("Student not found!");
-                }
-            }
-            else if (choice == "4")
-            {
-                double sum = 0;
-                for (int i = 0; i < grades.Count; i++)
-                {
-                    sum += grades[i];
-                }
-                Console.WriteLine("Average Grade: " + (sum / grades.Count));
-            }
-            else if (choice == "5")
-            {
-                Console.WriteLine("Goodbye!");
-                break;
-            }
-            else
-            {
-                Console.WriteLine("Invalid choice. Try again.");
-            }
-        }
-    }
+	public class Logger
+	{
+		public void LogMessage( string message )
+		{
+			System.IO.StreamWriter writer = new System.IO.StreamWriter( "log.txt" ); // No using statement, potential memory leak
+			writer.WriteLine( "Logging started..." );
+			writer.WriteLine( message );
+			writer.Close();
+		}
+	}
 }
 
+================================================================================
+
+===== UserManager.cs (/tmp/tmp1qzrk55t/GenAINumHandler/UserManager/UserManager.cs) =====
+﻿namespace UserManagement
+{
+	public class UserManager
+	{
+		public string ManageUsers()
+		{
+			string[] users = { "Alice", "Bob" };
+			return users[ 5 ]; // Index out of bounds, no error handling
+		}
+	}
+}
+
+================================================================================
+
+===== Program.cs (/tmp/tmp1qzrk55t/GenAINumHandler/DataProcessorMain/Program.cs) =====
+﻿using System;
+using InputProcessor;
+using UserManagement;
+using LoggingService;
+class Program
+{
+	static void Main()
+	{
+		Console.WriteLine( "Starting Application..." );
+
+		DataHandler dataHandler = new DataHandler();
+		var processedData = dataHandler.ProcessData();
+
+		UserManager userManager = new UserManager();
+		var user = userManager.ManageUsers();
+
+		Logger logger = new Logger();
+		logger.LogMessage( "Processed Data: " + processedData + " User: " + user );
+
+		// Redundant object creation
+		dataHandler = new DataHandler();
+		dataHandler.ProcessData();
+	}
+}
+
+================================================================================
+
+===== DataHandler.cs (/tmp/tmp1qzrk55t/GenAINumHandler/InputProcessor/DataHandler.cs) =====
+﻿using System;
+
+namespace InputProcessor
+{
+	public class DataHandler
+	{
+		private int num1 = 10;
+		private int num2 = 20;
+		private int[] dataArray = new int[ 1000000 ]; // Unused memory allocation
+
+		public int ProcessData()
+		{
+			Console.WriteLine( "Processing Data..." );
+			for ( int i = 0; i < 100000; i++ ) // Unnecessary large loop
+			{
+				Console.WriteLine( "Iteration: " + i );
+			}
+			int result = num1 + num2;
+			Console.WriteLine( "Calculated Result: " + result );
+			return result;
+		}
+	}
+}
 
 ================================================================================
 

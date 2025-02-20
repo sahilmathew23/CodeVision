@@ -19,7 +19,7 @@ def call_openai_api(prompt):
     print(f"Number of tokens in the prompt: {prompt_tokens}")
 
     data = {
-        'model': 'o1-2024-12-17',
+        'model': 'gpt-4-turbo',
         'messages': [{'role': 'user', 'content': prompt}]
     }
     try:
