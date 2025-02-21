@@ -10,36 +10,32 @@ namespace LoggingService
 
     public class Logger : ILogger
     {
-        private readonly string _filePath;
+        private readonly string _logFilePath;
 
         public Logger(string logFilePath = "log.txt")
         {
-            _filePath = logFilePath;
-            EnsureLogDirectoryExists();
+            _logFilePath = logFilePath;
         }
 
         public void LogMessage(string message)
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter(_filePath, true))
+                using (StreamWriter writer = new StreamWriter(_logFilePath, true)) // Enables appending and ensures disposal
                 {
-                    writer.WriteLine($"{DateTime.UtcNow}: {message}");
+                    writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
                 }
+            }
+            catch (IOException ex)
+            {
+                // Handling I/O errors that may occur when accessing the file
+                Console.Error.WriteLine($"An error occurred while writing to the log: {ex.Message}");
+                // Consider more sophisticated error reporting (e.g., event logging or another monitoring service)
             }
             catch (Exception ex)
             {
-                // Here, consider logging to an alternative location or triggering an alert
-                Console.WriteLine($"Failed to write log: {ex.Message}");
-            }
-        }
-
-        private void EnsureLogDirectoryExists()
-        {
-            string directory = Path.GetDirectoryName(_filePath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
+                // Handle unexpected errors
+                Console.Error.WriteLine($"Unexpected error occurred: {ex.Message}");
             }
         }
     }

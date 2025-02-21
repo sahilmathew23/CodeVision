@@ -6,8 +6,8 @@ namespace UserManagement
 {
     public interface IUserManager
     {
-        string GetUserName(int index);
-        IList<string> GetAllUsers();
+        string GetUser(int index);
+        IEnumerable<string> GetAllUsers();
     }
 
     public class UserManager : IUserManager
@@ -19,31 +19,18 @@ namespace UserManagement
             _users = new List<string> { "Alice", "Bob" };
         }
 
-        public string GetUserName(int index)
+        public string GetUser(int index)
         {
             if (index < 0 || index >= _users.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), $"User index {index} is out of bounds.");
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of bounds");
             }
             return _users[index];
         }
 
-        public IList<string> GetAllUsers() => _users.AsReadOnly();
-
-        public void AddUser(string user)
+        public IEnumerable<string> GetAllUsers()
         {
-            // Consider more validations or business rules as necessary
-            if (string.IsNullOrWhiteSpace(user))
-            {
-                throw new ArgumentException("Invalid user name: User name cannot be null or whitespace.");
-            }
-
-            if (_users.Contains(user))
-            {
-                throw new InvalidOperationException("User already exists.");
-            }
-
-            _users.Add(user);
+            return _users.AsReadOnly();
         }
     }
 }

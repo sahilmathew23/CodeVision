@@ -4,37 +4,20 @@ namespace InputProcessor
 {
     public class DataHandler
     {
-        private readonly ILogger _logger;
-
-        public DataHandler(ILogger logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public int ComputeSum(int num1, int num2)
-        {
-            _logger.LogDebug("Computing sum of two integers.");
-            return num1 + num2;
-        }
+        private int num1;
+        private int num2;
         
-        public void DisplayProcessedData(int result)
+        public DataHandler(int num1, int num2)
         {
-            _logger.LogInformation($"Calculated Result: {result}");
+            this.num1 = num1;
+            this.num2 = num2;
         }
-        
-        public void SimulateIterativeProcess(int iterations)
-        {
-            if (iterations < 0)
-                throw new ArgumentOutOfRangeException(nameof(iterations), "Iterations cannot be negative.");
 
-            _logger.LogDebug("Starting iterative simulation process.");
-            for (int i = 0; i < iterations; i++)
-            {
-                if (i % 1000 == 0) // Reducing the frequency of logging to every 1000 iterations
-                {
-                    _logger.LogDebug($"Iteration: {i}");
-                }
-            }
+        public int AddNumbers()
+        {
+            int result = num1 + num2;
+            Console.WriteLine($"Adding numbers: {num1} + {num2} = {result}");
+            return result;
         }
     }
 }

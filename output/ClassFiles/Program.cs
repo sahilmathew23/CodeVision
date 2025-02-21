@@ -5,31 +5,37 @@ using LoggingService;
 
 class Program
 {
-    private static readonly DataHandler _dataHandler = new DataHandler();
-    private static readonly UserManager _userManager = new UserManager();
-    private static readonly Logger _logger = new Logger();
-
     static void Main()
     {
         Console.WriteLine("Starting Application...");
 
         try
         {
-            var processedData = _dataHandler.ProcessData();
-            var user = _userManager.ManageUsers();
-            
-            _logger.LogMessage($"Processed Data: {processedData}, User: {user}");
+            IDataHandler dataHandler = new DataHandler();
+            var processedData = SafeExecute(() => dataHandler.ProcessData(), "Process Data");
 
-            DoAdditionalProcessing(); // Additional processing that reuses the same instance of DataHandler
+            IUserManager userManager = new UserManager();
+            var user = SafeExecute(() => userManager.ManageUsers(), "Manage Users");
+
+            ILogger logger = new Logger();
+            logger.LogMessage($"Processed Data: {processedData} User: {user}");
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during the application run: " + ex.Message);
+            Console.Error.WriteLine($"An unexpected error occurred: {ex.Message}");
         }
     }
 
-    private static void DoAdditionalProcessing()
+    private static T SafeExecute<T>(Func<T> func, string operation)
     {
-        _dataHandler.ProcessData(); // Use the same DataHandler object
+        try
+        {
+            return func();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during {operation}: {ex.Message}");
+            throw;
+        }
     }
 }
