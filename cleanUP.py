@@ -28,6 +28,7 @@ if __name__ == "__main__":
     paths_to_delete = [
         '/workspaces/CodeVision1/output/ZIP/Extracted',
         '/workspaces/CodeVision1/output/merged_output.txt',
+        '/workspaces/CodeVision1/output/ClassFiles'
     ]
     
     for path in paths_to_delete:
