@@ -1,10 +1,11 @@
 import os
 import requests
 import json
+import re
 import tiktoken  # OpenAI's tokenization library
 
 def call_openai_api(prompt):
-    """Call the OpenAI API with the provided prompt and return the response, along with token usage."""
+    """Call the OpenAI API with the provided prompt and return the response."""
     api_key = os.getenv("OPENAI_API_KEY")
     url = 'https://api.openai.com/v1/chat/completions'
     headers = {
@@ -12,10 +13,8 @@ def call_openai_api(prompt):
         'Authorization': f'Bearer {api_key}'
     }
 
-    # Tokenize the prompt to count the tokens
-    encoder = tiktoken.get_encoding("cl100k_base")  # Using the encoding for GPT-3.5 turbo models
-    prompt_tokens = len(encoder.encode(prompt))  # Get token count of the prompt
-
+    encoder = tiktoken.get_encoding("cl100k_base")
+    prompt_tokens = len(encoder.encode(prompt))
     print(f"Number of tokens in the prompt: {prompt_tokens}")
 
     data = {
@@ -26,23 +25,7 @@ def call_openai_api(prompt):
         response = requests.post(url, headers=headers, data=json.dumps(data))
         if response.status_code == 200:
             raw_response = response.json()
-            print("Raw API Response:", json.dumps(raw_response, indent=4))
-
-            # Extract token usage
-            input_tokens = raw_response.get("usage", {}).get("prompt_tokens", "N/A")
-            output_tokens = raw_response.get("usage", {}).get("completion_tokens", "N/A")
-
-            print(f"Input Tokens: {input_tokens}")
-            print(f"Output Tokens: {output_tokens}")
-            print(f"Total Tokens: {input_tokens + output_tokens} ")
-            print(f"Model : {data['model']} ")
-            
-
-            if 'choices' in raw_response and len(raw_response['choices']) > 0:
-                return raw_response['choices'][0]['message']['content']
-            else:
-                print("No 'choices' or 'content' in the response.")
-                return None
+            return raw_response['choices'][0]['message']['content'] if 'choices' in raw_response else None
         else:
             print(f"Error with API request: {response.status_code} {response.text}")
             return None
@@ -50,10 +33,26 @@ def call_openai_api(prompt):
         print(f"Error calling OpenAI API: {e}")
         return None
 
+def extract_files_from_merged_output(file_path):
+    """Extract individual file content from merged_output.txt."""
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.read()
+    
+    file_sections = re.split(r'===== (.*?) \((.*?)\) =====', content)[1:]
+    extracted_files = {}
+    
+    for i in range(0, len(file_sections), 3):
+        file_name = file_sections[i].strip()
+        file_path = file_sections[i+1].strip()
+        file_content = file_sections[i+2].strip()
+        extracted_files[file_name] = file_content
+    
+    return extracted_files
+
 def enhance():
-    """Enhance the code content from merged_output.txt using OpenAI API."""
-    input_file = "/workspaces/CodeVision1/merged_output.txt"
-    prompt_file = "/workspaces/CodeVision1/prompt.txt"
+    """Enhance each extracted file from merged_output.txt."""
+    input_file = "merged_output.txt"
+    prompt_file = "prompt.txt"
     
     if not os.path.exists(input_file):
         print("Error: Input file not found.")
@@ -62,27 +61,23 @@ def enhance():
         print("Error: Prompt file not found.")
         return
     
-    # Read file content
-    with open(input_file, "r", encoding="utf-8") as file:
-        file_content_str = file.read()
-    
-    # Read prompt content
+    # Read prompt template
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt_template = file.read()
     
-    # Construct the final prompt
-    prompt = prompt_template.format(file_content_str=file_content_str)
+    extracted_files = extract_files_from_merged_output(input_file)
     
-    # Call OpenAI API
-    output = call_openai_api(prompt)
-    
-    if output:
-        output_file = "/workspaces/CodeVision1/enhanced_output.txt"
-        with open(output_file, "w", encoding="utf-8") as file:
-            file.write(output)
-        print(f"Enhanced code has been saved to {output_file}")
-    else:
-        print("Enhancement process failed.")
+    for file_name, file_content in extracted_files.items():
+        prompt = prompt_template.format(file_name=file_name, file_content_str=file_content)
+        output = call_openai_api(prompt)
+        
+        if output:
+            output_file = f"enhanced_{file_name}"
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(output)
+            print(f"Enhanced version of {file_name} saved to {output_file}")
+        else:
+            print(f"Enhancement failed for {file_name}.")
 
-# Call the function to execute the enhancement
+# Run the enhancement process
 enhance()
