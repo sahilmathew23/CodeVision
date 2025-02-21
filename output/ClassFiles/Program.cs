@@ -11,31 +11,22 @@ class Program
 
         try
         {
-            IDataHandler dataHandler = new DataHandler();
-            var processedData = SafeExecute(() => dataHandler.ProcessData(), "Process Data");
+            var dataHandler = new DataHandler();
+            var processedData = dataHandler.ProcessData();
 
-            IUserManager userManager = new UserManager();
-            var user = SafeExecute(() => userManager.ManageUsers(), "Manage Users");
+            var userManager = new UserManager();
+            var user = userManager.ManageUsers();
 
-            ILogger logger = new Logger();
+            var logger = new Logger();
             logger.LogMessage($"Processed Data: {processedData} User: {user}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An unexpected error occurred: {ex.Message}");
+            var logger = new Logger();
+            logger.LogMessage($"An error occurred: {ex.Message}", LogLevel.Error);
+            Console.WriteLine("Application encountered an error. Please check logs.");
         }
-    }
 
-    private static T SafeExecute<T>(Func<T> func, string operation)
-    {
-        try
-        {
-            return func();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during {operation}: {ex.Message}");
-            throw;
-        }
+        Console.WriteLine("Application ended.");
     }
 }

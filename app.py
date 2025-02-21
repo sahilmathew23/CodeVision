@@ -52,7 +52,7 @@ def upload_file():
             
             # Automatically run run_pipeline.py with the uploaded file name as argument
             try:
-                #subprocess.run(["python", "run_pipeline.py", file.filename], check=True)
+                subprocess.run(["python", "run_pipeline.py", file.filename], check=True)
                 
                 # Define the path to the extracted zip file
                 extracted_file_path = '/workspaces/CodeVision1/output/ZIP'
@@ -61,9 +61,8 @@ def upload_file():
                 if os.path.exists(extracted_file_path):
                     print(f"Extracted file ZIP path: {extracted_file_path}/Extracted_files.zip")
 
-                    # Create the downloadable link for the extracted ZIP file
-                    download_link = url_for('download_file', filename='Extracted_files.zip', _external=True)
-                    return jsonify({"message": "Project Enhancement Completed.", "download_link": download_link}), 200
+                    # Directly download the extracted file
+                    return send_from_directory(extracted_file_path, 'Extracted_files.zip', as_attachment=True)
                 else:
                     return jsonify({"message": "Error: Extracted zip file not found after processing."}), 500
             except subprocess.CalledProcessError as e:
@@ -71,6 +70,7 @@ def upload_file():
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
     return render_template('upload.html')
+
 
 
 # Route to serve the extracted .zip file

@@ -6,29 +6,30 @@ namespace UserManagement
 {
     public interface IUserManager
     {
-        string GetUser(int index);
-        IEnumerable<string> GetAllUsers();
+        string FetchUser(int userId);
+        IEnumerable<string> FetchAllUsers();
     }
 
     public class UserManager : IUserManager
     {
-        private readonly List<string> _users;
+        private List<string> _users;
 
         public UserManager()
         {
-            _users = new List<string> { "Alice", "Bob" };
+            _users = new List<string> { "Alice", "Bob" }; // Initialize with default users
         }
 
-        public string GetUser(int index)
+        public string FetchUser(int userId)
         {
-            if (index < 0 || index >= _users.Count)
+            if (userId < 0 || userId >= _users.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of bounds");
+                throw new ArgumentOutOfRangeException(nameof(userId), "User ID is out of range.");
             }
-            return _users[index];
+
+            return _users[userId];
         }
 
-        public IEnumerable<string> GetAllUsers()
+        public IEnumerable<string> FetchAllUsers()
         {
             return _users.AsReadOnly();
         }

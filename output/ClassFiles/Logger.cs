@@ -10,32 +10,53 @@ namespace LoggingService
 
     public class Logger : ILogger
     {
-        private readonly string _logFilePath;
+        private readonly string _filePath;
+        private readonly object _lockObject = new object();
 
         public Logger(string logFilePath = "log.txt")
         {
-            _logFilePath = logFilePath;
+            _filePath = logFilePath;
+            InitializeLog();
+        }
+
+        private void InitializeLog()
+        {
+            try
+            {
+                if (!File.Exists(_filePath))
+                {
+                    using (StreamWriter writer = File.CreateText(_filePath))
+                    {
+                        writer.WriteLine("Logging initialized at " + DateTime.Now);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to initialize logging.", ex);
+            }
         }
 
         public void LogMessage(string message)
         {
+            if (string.IsNullOrEmpty(message))
+            {
+                throw new ArgumentException("Message to log cannot be null or empty.");
+            }
+
             try
             {
-                using (StreamWriter writer = new StreamWriter(_logFilePath, true)) // Enables appending and ensures disposal
+                lock (_lockObject)
                 {
-                    writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
+                    using (StreamWriter writer = new StreamWriter(_filePath, true))
+                    {
+                        writer.WriteLine($"{DateTime.Now}: {message}");
+                    }
                 }
             }
             catch (IOException ex)
             {
-                // Handling I/O errors that may occur when accessing the file
-                Console.Error.WriteLine($"An error occurred while writing to the log: {ex.Message}");
-                // Consider more sophisticated error reporting (e.g., event logging or another monitoring service)
-            }
-            catch (Exception ex)
-            {
-                // Handle unexpected errors
-                Console.Error.WriteLine($"Unexpected error occurred: {ex.Message}");
+                throw new IOException("Failed to write to log file.", ex);
             }
         }
     }
