@@ -41,6 +41,6 @@ if __name__ == "__main__":
     # Replace files
     replace_modified_files(class_files_path, extracted_files_path)
     
-    # Zip the extracted files after replacement
+    # Zip the extracted files after replacing 
     zip_file_name = "/workspaces/CodeVision1/output/ZIP/Extracted_files.zip"
     zip_all_files_in_directory(extracted_files_path, zip_file_name)
