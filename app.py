@@ -39,7 +39,7 @@ def upload_file():
             # Automatically run run_pipeline.py with the uploaded file name as argument
             try:
                 subprocess.run(["python", "run_pipeline.py", file.filename], check=True)
-                return jsonify({"message": f"File successfully uploaded to {filename} and pipeline executed."}), 200
+                return jsonify({"message": f"Project Enhancement Completed..."}), 200
             except subprocess.CalledProcessError as e:
                 return jsonify({"message": f"Error in running pipeline: {e}"}), 500
         else:

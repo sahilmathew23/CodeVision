@@ -1,4 +1,5 @@
-### Enhanced Version of `Logger.cs`:
+Here's the enhanced version of `Logger.cs`, featuring several improvements that align with the specified goals:
+
 ```csharp
 using System;
 using System.IO;
@@ -23,46 +24,46 @@ namespace LoggingService
         {
             try
             {
-                // Using "append" mode to avoid overwriting existing logs
                 using (StreamWriter writer = new StreamWriter(_logFilePath, append: true))
                 {
-                    writer.WriteLine($"Log Entry : {DateTime.Now}");
-                    writer.WriteLine(message);
-                    writer.WriteLine("-------------------------------");
+                    writer.WriteLine($"{DateTime.UtcNow}: {message}");
                 }
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine("Error writing to log file: " + ex.Message);
             }
             catch (Exception ex)
             {
-                // Basic exception handling; could log to a secondary source or raise further
-                Console.Error.WriteLine($"Failed to log message: {ex}");
+                Console.Error.WriteLine("An unexpected error occurred: " + ex.Message);
             }
         }
     }
 }
 ```
 
-### Explanation of Modifications:
-1. **Interface Implementation (`ILogger`):**
-   - Introduced an `ILogger` interface to follow the Dependency Inversion Principle ("D" in SOLID), allowing for easier replacement or extension of logging functionality without affecting dependent classes.
+**Explanation of Modifications:**
 
-2. **Flexible File Path:**
-   - Constructor injection is used to optionally specify a log file path, increasing flexibility and ease of configuration.
-   - Default value of "log.txt" is retained so existing code behaves the same if not updated.
+1. **Interface Implementation (`ILogger`)**:
+   - **SOLID Compliance**: Adhering to the Dependency Inversion Principle of SOLID, `ILogger` interface is introduced to decouple higher-level components from lower-level details of logger implementation, which enhances modularity and facilitates unit testing.
 
-3. **Using Statement:**
-   - Wrapped the `StreamWriter` object in a `using` statement to ensure the cleanup of resources (`IDisposable` pattern). This prevents file handle leaks and ensures files are closed properly after writing.
+2. **Constructor with File Path Parameter**:
+   - **Flexibility**: Allows specification of different log file paths, improving modularity and reusability by not hardcoding the file path, which is a better practice for scalability and maintainability.
 
-4. **Exception Handling:**
-   - Added basic exception handling around the file I/O operations to prevent the application from crashing due to IO exceptions like file access permissions errors. This logs the error to the console, but could easily be extended to include more sophisticated log failover scenarios (like logging to a secondary source).
+3. **Using statement**:
+   - **Resource Management**: Ensures that the `StreamWriter` is correctly disposed of, eliminating resource leaks which were present in the original code.
 
-5. **Append Mode for StreamWriter:**
-   - Set the `StreamWriter` to append mode to prevent overwriting existing logs, making it suitable for ongoing logging across application sessions.
+4. **Exception Handling**:
+   - **Robustness**: Catches both `IOException` and a general `Exception` to handle file-related errors and other unexpected errors respectively. Errors are logged to the console, providing traceability.
 
-6. **Improved Log Formatting:**
-   - Included timestamps and separators (`-------------------------------`) in log entries to enhance the readability and usefulness of the recorded logs.
+5. **Logging With Timestamp**:
+   - **Traceability**: Prefixing messages with `DateTime.UtcNow` to ensure each log entry is timestamped, aiding in debugging and log analysis.
 
-7. **Security and Performance Considerations:**
-   - Using `StreamWriter` directly is typically secure from injection attacks since writing is done to a file and not executed as code. However, file path handling and ensuring exclusive file write access could be further addressed depending on deployment specifics.
-   - For improved performance in multi-threaded scenarios, or where the log file might become a bottleneck, further enhancements could involve asynchronous logging mechanisms or buffered loggers.
+6. **Security & Best Practices**:
+   - **Append Mode**: Opens the log file in append mode to prevent overwriting existing logs which ensures that log data is preserved (important for auditing and troubleshooting).
+   - **Parameter Path**: By allowing the path to be specified, this code respects environments where the default write paths might be restricted, thus adhering to the security best practices concerning file I/O.
 
-This enhanced version adheres to .NET coding conventions, leverages SOLID principles for maintainability and future extensibility, and integrates basic best practices for error handling and performance.
+7. **Performance and Scalability**: 
+   - Opening and closing the file each time `LogMessage` is called can be expensive especially with numerous log entries. In a highly scalable scenario, considering a log server or asynchronous logging mechanism might be more appropriate if performance becomes a bottleneck. However, this implementation prioritizes simplicity and correctness, applicable for many standard use-cases.
+
+This enhancement leads to a logger that is not only flexible but also reliable and easy to integrate or extend within larger applications, while providing necessary error management and security practices.
