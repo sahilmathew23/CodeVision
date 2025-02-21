@@ -5,7 +5,7 @@ import subprocess
 app = Flask(__name__)
 
 # Define the directory where the uploaded file will be saved
-UPLOAD_FOLDER = '/workspaces/CodeVision1/'
+UPLOAD_FOLDER = '/workspaces/CodeVision1/input'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'zip'}
 

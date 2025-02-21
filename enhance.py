@@ -51,8 +51,8 @@ def extract_files_from_merged_output(file_path):
 
 def enhance():
     """Enhance each extracted file from merged_output.txt."""
-    input_file = "merged_output.txt"
-    prompt_file = "prompt.txt"
+    input_file = "output/merged_output.txt"
+    prompt_file = "input/prompt.txt"
     
     if not os.path.exists(input_file):
         print("Error: Input file not found.")
@@ -72,7 +72,7 @@ def enhance():
         output = call_openai_api(prompt)
         
         if output:
-            output_file = f"enhanced_{file_name}"
+            output_file = f"output/enhanced_{file_name}"
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(output)
             print(f"Enhanced version of {file_name} saved to {output_file}")
