@@ -3,7 +3,6 @@ import shutil
 
 # List of files and directories to delete
 paths_to_delete = [
-    '/workspaces/CodeVision1/output/classFiles/',
     '/workspaces/CodeVision1/output/ZIP/Extracted',
     '/workspaces/CodeVision1/output/merged_output.txt',
     '/workspaces/CodeVision1/input/'
