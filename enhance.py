@@ -16,6 +16,7 @@ def call_openai_api(prompt):
     encoder = tiktoken.get_encoding("cl100k_base")
     prompt_tokens = len(encoder.encode(prompt))
     print(f"Number of tokens in the prompt: {prompt_tokens}")
+    print()
 
     data = {
         'model': 'gpt-4-turbo',
@@ -67,15 +68,17 @@ def enhance():
     
     extracted_files = extract_files_from_merged_output(input_file)
     
+    output_dir = "output/enhancedClassFiles"
+    os.makedirs(output_dir, exist_ok=True) 
     for file_name, file_content in extracted_files.items():
         prompt = prompt_template.format(file_name=file_name, file_content_str=file_content)
         output = call_openai_api(prompt)
         
         if output:
-            output_file = f"output/classFiles/{file_name}"
+            output_file = f"output/enhancedClassFiles/enhanced_{file_name}"
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(output)
-            print(f"Enhanced version of {file_name} saved to {output_file}")
+            print(f"Enhanced version of {file_name} saved to {output_file}\n")
         else:
             print(f"Enhancement failed for {file_name}.")
 

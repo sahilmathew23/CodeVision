@@ -6,6 +6,13 @@ app = Flask(__name__)
 
 # Define the directory where the uploaded file will be saved
 UPLOAD_FOLDER = '/workspaces/CodeVision1/input'
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+    print(f"Folder '{UPLOAD_FOLDER}' created.")
+else:
+    print(f"Folder '{UPLOAD_FOLDER}' already exists.")
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'zip'}
 

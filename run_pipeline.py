@@ -25,14 +25,44 @@ def main():
     directory_to_scan = f"/workspaces/CodeVision1/input/{project_name}"
     output_file = "/workspaces/CodeVision1/output/merged_output.txt"
     
+    #this will combine the input in 1 file
     print(f"Scanning project: {project_name}...")
-    print("Starting scanAndMerge.py...")
+    print("Starting scanAndMerge.py...\n")
     run_script("scanAndMerge.py", directory_to_scan, output_file)
+    print()
+    print()
     
-    print("Starting enhance.py...")
+    #this will call the model and enhance the code
+    print("Starting enhance.py...\n")
     run_script("enhance.py")
+    print()
+    print()
+
+    #this will clean file & get required code and save it in Class files
+    print("Starting extractCSharpCode.py...\n")
+    run_script("extractCSharpCode.py")
+    print()
+    print()
     
-    print("Pipeline execution complete.")
+    #this will extract .zip file that was uploaded in ZIP/Extracted folder
+    print("Starting ExtractZIP.py...\n")
+    run_script("ExtractZIP.py")
+    print()
+    print()
+    
+    #this will replace ClassFiles in the Extracted Folder & ZIP it
+    print("Starting replaceEnhancedCsAndZIP.py...\n")
+    run_script("replaceEnhancedCsAndZIP.py")
+    print()
+    print()
+    
+    #Removes temp files & folders
+    print("Starting cleanUp.py...\n")
+    run_script("cleanUP.py")
+    print()
+    print()
+    
+    print("Pipeline execution complete.\n")
 
 if __name__ == "__main__":
     main()
