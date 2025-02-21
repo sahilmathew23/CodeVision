@@ -72,7 +72,7 @@ def enhance():
         output = call_openai_api(prompt)
         
         if output:
-            output_file = f"output/{file_name}"
+            output_file = f"output/classFiles/{file_name}"
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(output)
             print(f"Enhanced version of {file_name} saved to {output_file}")

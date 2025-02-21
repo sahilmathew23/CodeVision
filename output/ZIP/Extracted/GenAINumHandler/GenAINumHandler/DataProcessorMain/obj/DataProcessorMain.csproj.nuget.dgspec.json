@@ -1,0 +1,118 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\DataProcessorMain\\DataProcessorMain.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\DataProcessorMain\\DataProcessorMain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\DataProcessorMain\\DataProcessorMain.csproj",
+        "projectName": "DataProcessorMain",
+        "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\DataProcessorMain\\DataProcessorMain.csproj",
+        "packagesPath": "C:\\Users\\sahil\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\DataProcessorMain\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\sahil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\InputProcessor\\InputProcessor.csproj": {
+                "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\InputProcessor\\InputProcessor.csproj"
+              },
+              "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\LoggingService\\LoggingService.csproj": {
+                "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\LoggingService\\LoggingService.csproj"
+              },
+              "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\UserManager\\UserManager.csproj": {
+                "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\UserManager\\UserManager.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\InputProcessor\\InputProcessor.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\InputProcessor\\InputProcessor.csproj",
+        "projectName": "InputProcessor",
+        "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\InputProcessor\\InputProcessor.csproj",
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
+    "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\LoggingService\\LoggingService.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\LoggingService\\LoggingService.csproj",
+        "projectName": "LoggingService",
+        "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\LoggingService\\LoggingService.csproj",
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
+    "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\UserManager\\UserManager.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\UserManager\\UserManager.csproj",
+        "projectName": "UserManager",
+        "projectPath": "C:\\Users\\sahil\\source\\repos\\GenAINumHandler\\UserManager\\UserManager.csproj",
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-===== UserManager.cs (/tmp/tmp2f0n7i5e/GenAINumHandler/UserManager/UserManager.cs) =====
+===== UserManager.cs (/tmp/tmp747ez6vq/GenAINumHandler/UserManager/UserManager.cs) =====
 ﻿namespace UserManagement
 {
 	public class UserManager
@@ -13,24 +13,7 @@
 
 ================================================================================
 
-===== Logger.cs (/tmp/tmp2f0n7i5e/GenAINumHandler/LoggingService/Logger.cs) =====
-﻿namespace LoggingService
-{
-	public class Logger
-	{
-		public void LogMessage( string message )
-		{
-			System.IO.StreamWriter writer = new System.IO.StreamWriter( "log.txt" ); // No using statement, potential memory leak
-			writer.WriteLine( "Logging started..." );
-			writer.WriteLine( message );
-			writer.Close();
-		}
-	}
-}
-
-================================================================================
-
-===== DataHandler.cs (/tmp/tmp2f0n7i5e/GenAINumHandler/InputProcessor/DataHandler.cs) =====
+===== DataHandler.cs (/tmp/tmp747ez6vq/GenAINumHandler/InputProcessor/DataHandler.cs) =====
 ﻿using System;
 
 namespace InputProcessor
@@ -57,7 +40,7 @@ namespace InputProcessor
 
 ================================================================================
 
-===== Program.cs (/tmp/tmp2f0n7i5e/GenAINumHandler/DataProcessorMain/Program.cs) =====
+===== Program.cs (/tmp/tmp747ez6vq/GenAINumHandler/DataProcessorMain/Program.cs) =====
 ﻿using System;
 using InputProcessor;
 using UserManagement;
@@ -80,6 +63,23 @@ class Program
 		// Redundant object creation
 		dataHandler = new DataHandler();
 		dataHandler.ProcessData();
+	}
+}
+
+================================================================================
+
+===== Logger.cs (/tmp/tmp747ez6vq/GenAINumHandler/LoggingService/Logger.cs) =====
+﻿namespace LoggingService
+{
+	public class Logger
+	{
+		public void LogMessage( string message )
+		{
+			System.IO.StreamWriter writer = new System.IO.StreamWriter( "log.txt" ); // No using statement, potential memory leak
+			writer.WriteLine( "Logging started..." );
+			writer.WriteLine( message );
+			writer.Close();
+		}
 	}
 }
 
