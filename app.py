@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, jsonify, redirect, url_for
 import os
+import subprocess
 
 app = Flask(__name__)
 
@@ -34,7 +35,13 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
-            return jsonify({"message": f"File successfully uploaded to {filename}"}), 200
+            
+            # Automatically run run_pipeline.py with the uploaded file name as argument
+            try:
+                subprocess.run(["python", "run_pipeline.py", file.filename], check=True)
+                return jsonify({"message": f"File successfully uploaded to {filename} and pipeline executed."}), 200
+            except subprocess.CalledProcessError as e:
+                return jsonify({"message": f"Error in running pipeline: {e}"}), 500
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
     return render_template('upload.html')
