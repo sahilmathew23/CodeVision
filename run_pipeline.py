@@ -22,7 +22,7 @@ def main():
     project_name = uploaded_filename  # Use the uploaded file name as the project name
     
     # Construct the directory to scan dynamically
-    directory_to_scan = f"/workspaces/CodeVision1/{project_name}"
+    directory_to_scan = f"/workspaces/CodeVision1/input/{project_name}"
     output_file = "/workspaces/CodeVision1/output/merged_output.txt"
     
     print(f"Scanning project: {project_name}...")
