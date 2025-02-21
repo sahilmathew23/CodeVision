@@ -1,4 +1,19 @@
-===== Logger.cs (/tmp/tmp1qzrk55t/GenAINumHandler/LoggingService/Logger.cs) =====
+===== UserManager.cs (/tmp/tmp_7rt9bf4/GenAINumHandler/UserManager/UserManager.cs) =====
+﻿namespace UserManagement
+{
+	public class UserManager
+	{
+		public string ManageUsers()
+		{
+			string[] users = { "Alice", "Bob" };
+			return users[ 5 ]; // Index out of bounds, no error handling
+		}
+	}
+}
+
+================================================================================
+
+===== Logger.cs (/tmp/tmp_7rt9bf4/GenAINumHandler/LoggingService/Logger.cs) =====
 ﻿namespace LoggingService
 {
 	public class Logger
@@ -15,22 +30,34 @@
 
 ================================================================================
 
-===== UserManager.cs (/tmp/tmp1qzrk55t/GenAINumHandler/UserManager/UserManager.cs) =====
-﻿namespace UserManagement
+===== DataHandler.cs (/tmp/tmp_7rt9bf4/GenAINumHandler/InputProcessor/DataHandler.cs) =====
+﻿using System;
+
+namespace InputProcessor
 {
-	public class UserManager
+	public class DataHandler
 	{
-		public string ManageUsers()
+		private int num1 = 10;
+		private int num2 = 20;
+		private int[] dataArray = new int[ 1000000 ]; // Unused memory allocation
+
+		public int ProcessData()
 		{
-			string[] users = { "Alice", "Bob" };
-			return users[ 5 ]; // Index out of bounds, no error handling
+			Console.WriteLine( "Processing Data..." );
+			for ( int i = 0; i < 100000; i++ ) // Unnecessary large loop
+			{
+				Console.WriteLine( "Iteration: " + i );
+			}
+			int result = num1 + num2;
+			Console.WriteLine( "Calculated Result: " + result );
+			return result;
 		}
 	}
 }
 
 ================================================================================
 
-===== Program.cs (/tmp/tmp1qzrk55t/GenAINumHandler/DataProcessorMain/Program.cs) =====
+===== Program.cs (/tmp/tmp_7rt9bf4/GenAINumHandler/DataProcessorMain/Program.cs) =====
 ﻿using System;
 using InputProcessor;
 using UserManagement;
@@ -53,33 +80,6 @@ class Program
 		// Redundant object creation
 		dataHandler = new DataHandler();
 		dataHandler.ProcessData();
-	}
-}
-
-================================================================================
-
-===== DataHandler.cs (/tmp/tmp1qzrk55t/GenAINumHandler/InputProcessor/DataHandler.cs) =====
-﻿using System;
-
-namespace InputProcessor
-{
-	public class DataHandler
-	{
-		private int num1 = 10;
-		private int num2 = 20;
-		private int[] dataArray = new int[ 1000000 ]; // Unused memory allocation
-
-		public int ProcessData()
-		{
-			Console.WriteLine( "Processing Data..." );
-			for ( int i = 0; i < 100000; i++ ) // Unnecessary large loop
-			{
-				Console.WriteLine( "Iteration: " + i );
-			}
-			int result = num1 + num2;
-			Console.WriteLine( "Calculated Result: " + result );
-			return result;
-		}
 	}
 }
 

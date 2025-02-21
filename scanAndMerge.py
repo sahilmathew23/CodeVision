@@ -2,6 +2,7 @@ import os
 import zipfile
 import tempfile
 import re
+import sys
 
 auto_generated_regex = re.compile(r"(AssemblyInfo|GlobalUsings\.g|AssemblyAttributes|.*\.g)\.cs$", re.IGNORECASE)
 
@@ -16,16 +17,19 @@ def scan_and_merge_cs_files(directory, output_file):
                             content = infile.read()
                             outfile.write(f"===== {file} ({file_path}) =====\n")
                             outfile.write(content + "\n\n")
-                            outfile.write("=" * 80 + "\n\n")  # Separator for readability
-                            # Print the name and path of each merged file
+                            outfile.write("=" * 80 + "\n\n")
                             print(f"{file} ({file_path})")
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
 
-if __name__ == "__main__": 
-    directory_to_scan = "/workspaces/CodeVision1/GenAINumHandler.zip"
-    output_file_path = "/workspaces/CodeVision1/merged_output.txt"
-    
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python scanAndMerge.py <directory_to_scan> <output_file>")
+        sys.exit(1)
+
+    directory_to_scan = sys.argv[1]
+    output_file_path = sys.argv[2]
+
     if directory_to_scan.endswith(".zip"):
         with tempfile.TemporaryDirectory() as temp_dir:
             try:
@@ -36,5 +40,3 @@ if __name__ == "__main__":
                 print(f"Error extracting zip file: {e}")
     else:
         scan_and_merge_cs_files(directory_to_scan, output_file_path)
-    
-    #print(f"All .cs files have been merged into {output_file_path}")
