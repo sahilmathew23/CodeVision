@@ -62,11 +62,16 @@ if __name__ == "__main__":
     replace_modified_files(class_files_path, extracted_files_path)
     
     #Move merged_output.txt, enhancedClasses to be zipped
-    source_file = "/workspaces/CodeVision1/output/merged_output.txt"
-    destination_file = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/merged_output.txt" 
+    source_fileMergedOutput = "/workspaces/CodeVision1/output/merged_output.txt"
+    source_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/enhanced_merged_output.txt"
+    
+    destination_fileMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/merged_output.txt" 
+    destination_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/enhanced_merged_output.txt" 
+    
     source_dir = "/workspaces/CodeVision1/output/enhancedClassFiles"
     destination_dir = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/DetailedEnhancementInfo"
-    move_file(source_file, destination_file)
+    move_file(source_fileMergedOutput, destination_fileMergedOutput)
+    move_file(source_fileEnhancedMergedOutput, destination_fileEnhancedMergedOutput)
     move_files(source_dir, destination_dir)
 
     # Zip the extracted files after replacing 

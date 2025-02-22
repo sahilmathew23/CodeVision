@@ -123,6 +123,22 @@ def enhance(model_name):
         else:
             print(f"Enhancement failed for {file_name}.")
 
+    input_dir = "/workspaces/CodeVision1/output/enhancedClassFiles"
+    output_file = "/workspaces/CodeVision1/output/enhanced_merged_output.txt"
+
+    separator = "\n" + "=" * 80 + "\n"  # A clear separator line
+
+    with open(output_file, "w", encoding="utf-8") as outfile:
+        for filename in sorted(os.listdir(input_dir)):  # Sorting for order
+            file_path = os.path.join(input_dir, filename)
+            if os.path.isfile(file_path):  # Ensure it's a file
+                with open(file_path, "r", encoding="utf-8") as infile:
+                    outfile.write(f"\nFile: {filename}\n")  # File name header
+                    outfile.write(separator)  # Separator line
+                    outfile.write(infile.read().strip() + "\n")  # File content
+                    outfile.write(separator)  # Another separator for next file
+
+    print(f"All files merged into {output_file}")
 # Run the enhancement process
 if __name__ == "__main__":
     if len(sys.argv) < 2:
