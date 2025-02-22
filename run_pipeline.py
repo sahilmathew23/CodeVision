@@ -57,10 +57,10 @@ def main():
     print()
     
     #Removes temp files & folders
-    print("Starting cleanUp.py...\n")
-    run_script("cleanUP.py")
-    print()
-    print()
+    #print("Starting cleanUp.py...\n")
+    #run_script("cleanUP.py")
+    #print()
+    #print()
     
     print("Pipeline execution complete.\n")
 
