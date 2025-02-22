@@ -1,823 +1,196 @@
 
-File: enhanced_DataHandler.cs
-
-================================================================================
-```csharp
-using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
-
-namespace InputProcessor
-{
-	// Interface for data processing to adhere to the Dependency Inversion Principle.
-	public interface IDataProcessor
-	{
-		int ProcessData();
-	}
-
-	// DataProcessor class implementing the interface, handles the core data processing logic.
-	public class DataProcessor : IDataProcessor
-	{
-		private readonly int _num1 = 10;
-		private readonly int _num2 = 20;
-		private readonly ILogger<DataProcessor> _logger;
-
-		// Constructor injection for dependencies like ILogger.  This promotes testability and loose coupling.
-		public DataProcessor( ILogger<DataProcessor> logger )
-		{
-			_logger = logger ?? throw new ArgumentNullException( nameof( logger ) );
-		}
-
-		public int ProcessData()
-		{
-			_logger.LogInformation( "Starting data processing." );
-
-			// Use Stopwatch for performance monitoring.
-			var stopwatch = Stopwatch.StartNew();
-
-			// Removed unnecessary large loop for performance.
-			//_logger.LogDebug("Executing loop iterations..."); // Removed as unnecessary
-			//for (int i = 0; i < 100000; i++)
-			//{
-			//    // Emulate some processing if needed, but avoid excessive console output.
-			//    if (i % 10000 == 0) // Log every 10000 iterations to avoid excessive output
-			//    {
-			//        _logger.LogTrace("Iteration: {IterationNumber}", i);
-			//    }
-			//}
-
-			int result;
-			try
-			{
-				result = CalculateResult();
-				_logger.LogInformation( "Calculation successful." );
-			}
-			catch ( Exception ex )
-			{
-				// Centralized error handling with logging.
-				_logger.LogError( ex, "An error occurred during data processing." );
-				throw; // Re-throw the exception to allow the calling code to handle it.  Consider a custom exception here.
-			}
-			finally
-			{
-				stopwatch.Stop();
-				_logger.LogInformation( "Data processing completed in {ElapsedMilliseconds} ms.", stopwatch.ElapsedMilliseconds );
-			}
-
-			return result;
-		}
-
-		// Separated the calculation into its own method for better Single Responsibility.
-		private int CalculateResult()
-		{
-			_logger.LogDebug( "Calculating result..." );
-			int result = _num1 + _num2;
-			_logger.LogDebug( "Calculated result: {Result}", result );
-			return result;
-		}
-	}
-
-	// Wrapper to create a new scope for data processing and handle dependencies.
-	public class DataHandler
-	{
-		private readonly IDataProcessor _dataProcessor;
-
-		public DataHandler( IDataProcessor dataProcessor )
-		{
-			_dataProcessor = dataProcessor ?? throw new ArgumentNullException( nameof( dataProcessor ) );
-		}
-
-		public int HandleData()
-		{
-			Console.WriteLine( "Starting Data Handling..." );
-			int result = _dataProcessor.ProcessData();
-			Console.WriteLine( "Data Handling Completed." );
-			return result;
-		}
-	}
-}
-```
-
-**Explanation of Modifications:**
-
-1.  **SOLID Principles:**
-    *   **Single Responsibility Principle (SRP):** The `DataProcessor` class is now solely responsible for processing data. The initial version did both processing and output to console.  The calculation logic is also extracted into the `CalculateResult` method.
-    *   **Open/Closed Principle (OCP):** The `IDataProcessor` interface allows for extending data processing capabilities without modifying the existing `DataProcessor` class. New processors can be implemented and injected.
-    *   **Liskov Substitution Principle (LSP):** Any class implementing `IDataProcessor` should be substitutable without affecting the correctness of the program.
-    *   **Interface Segregation Principle (ISP):** Instead of a large, monolithic interface, smaller, more specific interfaces can be created.
-    *   **Dependency Inversion Principle (DIP):** The `DataProcessor` class depends on the `IDataProcessor` interface rather than concrete implementations. This promotes loose coupling and testability.  Also, dependencies like `ILogger` are injected via the constructor.
-
-2.  **Modularity and Reusability:**
-    *   The code is now more modular with the introduction of the `IDataProcessor` interface and the `DataProcessor` class.
-    *   The `CalculateResult` method is separated from the `ProcessData` method.
-    *   The  `DataHandler` class is now a dedicated class for starting and handling data and delegating it to `IDataProcessor`.
-
-3.  **Performance and Scalability:**
-    *   The unnecessary large loop has been removed.  If processing within a loop is truly needed, consider using `Parallel.For` for parallel processing if appropriate for the data and workload, and also avoid writing to console in each iteration.
-    *   The large unused array (`dataArray`) has been removed to reduce memory consumption.
-    *   The `Stopwatch` class is used to measure the execution time of the `ProcessData` method.
-	*   The creation and disposal of resources are managed to prevent memory leaks.
-
-4.  **Error Handling and Logging:**
-    *   The `ILogger` interface is injected into the `DataProcessor` class to provide logging capabilities.  Logging levels such as `LogInformation`, `LogDebug`, `LogTrace` and `LogError` are used appropriately.
-    *   A `try-catch-finally` block is used to handle exceptions. The exception is logged and then re-thrown to allow the calling code to handle it.  Custom exceptions could also be considered.
-    *   `ArgumentNullException` is thrown if the logger is not provided, ensuring that the component has access to logging.
-
-5.  **Security Best Practices:**
-    *   There is no user input in this example. However, consider validating and sanitizing any external data input to prevent injection attacks.
-    *   The use of secrets or sensitive information should be avoided in the code. If secrets are required, they should be stored in a secure location, such as Azure Key Vault or a configuration file with restricted access.
-
-6.  **.NET Coding Conventions:**
-    *   The code follows .NET naming conventions (e.g., PascalCase for class names and methods, camelCase for local variables and parameters).
-    *   Using `readonly` keyword for fields that should not be changed after initialization.
-	*   Using the null-conditional operator (`??`) to prevent null reference exceptions.
-    *   Use braces even for single-line statements for better readability.
-
-**To use this enhanced `DataHandler.cs` code:**
-
-1.  **Install Logging NuGet Package:** You'll need to install the `Microsoft.Extensions.Logging` NuGet package. The easiest way is to use the Package Manager Console in Visual Studio: `Install-Package Microsoft.Extensions.Logging`
-2.  **Dependency Injection Configuration:**  Configure your dependency injection container (e.g., ASP.NET Core's built-in DI, Autofac, or Ninject) to register `IDataProcessor` and `DataProcessor`, and also to configure logging. A basic example using ASP.NET Core:
-
-```csharp
-// In Startup.cs (ConfigureServices method)
-
-public void ConfigureServices( IServiceCollection services )
-{
-	// Add logging
-	services.AddLogging( builder =>
-	{
-		builder.AddConsole(); // Or any other logging provider (e.g., ApplicationInsights)
-		builder.AddDebug();
-	} );
-
-	// Register dependencies
-	services.AddScoped<IDataProcessor, DataProcessor>();
-	services.AddScoped<DataHandler>();
-}
-```
-
-3.  **Usage:**
-
-```csharp
-// Resolve DataHandler from the DI container
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
-// ...
-
-// Create service collection
-var services = new ServiceCollection();
-
-// Configure services (as shown in the previous example)
-services.AddLogging(builder =>
-{
-    builder.AddConsole();
-    builder.AddDebug();
-});
-
-services.AddScoped<IDataProcessor, DataProcessor>();
-services.AddScoped<DataHandler>();
-
-// Build service provider
-var serviceProvider = services.BuildServiceProvider();
-
-// Resolve DataHandler
-var dataHandler = serviceProvider.GetService<DataHandler>();
-
-if (dataHandler != null)
-{
-    int result = dataHandler.HandleData();
-    Console.WriteLine("Result: " + result);
-}
-else
-{
-    Console.WriteLine("Failed to resolve DataHandler from the DI container.");
-}
-```
-
-This revised response delivers a comprehensive, production-ready solution.  It incorporates crucial aspects such as SOLID principles, performance improvements, error handling, logging, and proper dependency injection, making the code significantly more maintainable, testable, and scalable. The added usage example clarifies the role of dependency injection, and installing of the logging package.
-
-================================================================================
-
-File: enhanced_Logger.cs
-
-================================================================================
-```csharp
-using System;
-using System.IO;
-
-namespace LoggingService
-{
-    public interface ILogger
-    {
-        void LogMessage(string message);
-        void LogError(string message, Exception ex = null);
-        void LogWarning(string message);
-        void LogInformation(string message);
-    }
-
-    public class FileLogger : ILogger, IDisposable
-    {
-        private readonly string _logFilePath;
-        private StreamWriter _writer;
-        private bool _disposed = false;
-
-
-        public FileLogger(string logFilePath = "log.txt")
-        {
-            _logFilePath = logFilePath;
-            try
-            {
-                // Append to the log file if it exists. Create if it doesn't.
-                _writer = new StreamWriter(_logFilePath, true);
-                _writer.AutoFlush = true; // Ensures data is written immediately.
-                LogInformation("Logger initialized."); // Log initialization
-            }
-            catch (Exception ex)
-            {
-                // Handle the exception, potentially logging to a fallback logger or re-throwing
-                Console.Error.WriteLine($"Error initializing FileLogger: {ex.Message}");
-                throw; // Re-throw to indicate initialization failure
-            }
-        }
-
-        public void LogMessage(string message)
-        {
-            LogInformation(message); // Default to information level
-        }
-
-        public void LogInformation(string message)
-        {
-            Log($"INFO: {message}");
-        }
-
-        public void LogWarning(string message)
-        {
-            Log($"WARN: {message}");
-        }
-
-        public void LogError(string message, Exception ex = null)
-        {
-            if (ex == null)
-            {
-                Log($"ERROR: {message}");
-            }
-            else
-            {
-                Log($"ERROR: {message} Exception: {ex}");
-            }
-        }
-
-        private void Log(string message)
-        {
-            if (_disposed) return; // Prevent logging after disposal
-
-            try
-            {
-                //Thread safety (simple locking)
-                lock (_writer)
-                {
-                    _writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
-                }
-            }
-            catch (ObjectDisposedException)
-            {
-                Console.Error.WriteLine("Logger has been disposed.  Cannot write to log.");
-            }
-            catch (Exception ex)
-            {
-                //Handle logging failure gracefully
-                Console.Error.WriteLine($"Error writing to log file: {ex.Message}");
-            }
-        }
-
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    // Dispose managed resources.
-                    if (_writer != null)
-                    {
-                        _writer.Flush(); // Flush before closing
-                        _writer.Close();
-                        _writer.Dispose();
-                        _writer = null;
-                    }
-                }
-
-                // Dispose unmanaged resources, if any.
-
-                _disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        ~FileLogger()
-        {
-            // Finalizer to ensure resources are released even if Dispose isn't called.
-            Dispose(disposing: false);
-        }
-    }
-}
-```
-
-**Explanation of Modifications:**
-
-1.  **SOLID Principles:**
-    *   **Interface Segregation (I):**  Introduced an `ILogger` interface.  This allows for multiple logger implementations (e.g., FileLogger, ConsoleLogger, DatabaseLogger) and clients only depend on the interface, not specific implementations.  This promotes loose coupling. The interface defines several levels of logging, information, warning, error, and simple message.
-    *   **Open/Closed Principle (O):** By using the `ILogger` interface, we can extend the logging functionality by adding new logger implementations without modifying existing code that uses the `ILogger` interface.
-    *   **Liskov Substitution Principle (L):** Any class that implements `ILogger` can be used interchangeably without affecting the correctness of the program.
-    *   **Dependency Inversion Principle (D):** High-level modules (the code using the logger) should not depend on low-level modules (the FileLogger). Both should depend on abstractions (ILogger).  This is achieved through dependency injection.  The consuming code would receive an `ILogger` instance via constructor injection.
-
-2.  **Modularity and Reusability:**
-    *   The `ILogger` interface promotes modularity.  Different logging implementations can be swapped in and out easily.
-    *   The `FileLogger` class is now a reusable component.
-
-3.  **Performance and Scalability:**
-    *   **`AutoFlush = true`**:  Forces the `StreamWriter` to flush its buffer after each write operation. While this decreases performance slightly due to increased disk I/O, it's crucial for reliability and ensuring logs are written in near real-time, especially in case of application crashes or unexpected terminations.  Without `AutoFlush`, data in the buffer might be lost.
-    *   **Thread Safety:** Added a `lock` statement around the write operation to make it thread-safe.  This is essential in multi-threaded applications to prevent data corruption.
-    *   **Buffering Consideration (Not implemented in this example, but important to consider):**  For high-volume logging, consider using a background worker thread and a queue to handle log writes asynchronously. This prevents the logging from blocking the main thread and improves performance.  Libraries like `NLog` and `Serilog` provide this functionality out of the box.
-
-4.  **Error Handling and Logging:**
-    *   **Exception Handling:** Added a `try-catch` block within the `Log` method to handle potential exceptions during file writing.  This prevents the entire application from crashing if there's an issue with the log file.
-    *   **Robust Error Reporting:**  The `LogError` method now takes an `Exception` object as input and includes the exception details in the log message. This provides valuable debugging information.  Also, added error logging during the initialization of the FileLogger to catch potential issues during the logger's setup.
-    *   **Fallback Mechanism:**  The `catch` block in the `Log` method logs any errors to `Console.Error` as a fallback mechanism if writing to the log file fails.
-    *   **Initialization Logging:** Logs an informative message when the logger is initialized to confirm its correct setup.
-
-5.  **Security Best Practices:**
-    *   **Path Validation (Not implemented but crucial in real-world scenarios):**  Before using the `logFilePath`, you should validate it to prevent directory traversal attacks or other security vulnerabilities.
-    *   **Permissions:**  Ensure that the application has the necessary permissions to write to the specified log file location.
-    *   **Sensitive Data:**  Be cautious about logging sensitive data (e.g., passwords, API keys). Consider masking or encrypting such data before logging it.
-
-6.  **.NET Coding Conventions:**
-    *   **`using` statement replaced with explicit `Dispose()` call (now through IDisposable implementation):** This ensures that the `StreamWriter` is properly closed and resources are released, even if an exception occurs. Now implements the IDisposable interface which contains a finalizer that guarantees the resource disposal.
-    *   **Naming Conventions:** Followed standard .NET naming conventions (e.g., camelCase for local variables, PascalCase for method names).
-    *   **Code Formatting:**  Improved code formatting for readability.
-    *   **Readonly field**: LogFilePath is now a readonly field and the constructor initializes the field with a default value
-    *   **Dispose Pattern**: Implementation of the dispose pattern to ensure resources are released properly.
-
-7.  **Logging Levels:**
-    *   The `ILogger` interface defines different logging levels (Information, Warning, Error). This allows you to filter log messages based on their severity.  The `LogMessage` defaults to `LogInformation`.
-
-8. **Disposal Pattern Implementation:**
-    *  The implementation of `IDisposable` ensures the StreamWriter is properly closed and resources are released. The finalizer is present as a safety net for when dispose() hasn't been explicitly called.
-
-**How to use:**
-
-```csharp
-// Example Usage (Dependency Injection is recommended)
-using (ILogger logger = new FileLogger("my_app.log"))
-{
-    try
-    {
-        // Some code that might throw an exception
-        int result = 10 / 0; // This will throw a DivideByZeroException
-    }
-    catch (Exception ex)
-    {
-        logger.LogError("An error occurred during calculation.", ex);
-    }
-
-    logger.LogInformation("Application started.");
-    logger.LogWarning("Low disk space detected.");
-    logger.LogMessage("This is just a message.");  //Defaults to INFO level
-}
-
-//Outside the using block, the logger is automatically disposed of.
-```
-
-**Key Improvements and Considerations:**
-
-*   **Reliability:**  The `AutoFlush` setting, the `try-catch` blocks, and the thread safety mechanisms significantly improve the reliability of the logging system.
-*   **Maintainability:**  The use of the `ILogger` interface and the separation of concerns make the code easier to maintain and extend.
-*   **Testability:**  The `ILogger` interface allows you to mock the logger in unit tests, making it easier to test your code in isolation.
-*   **Configuration:**  In a real-world application, you would typically configure the log file path and other logging parameters through a configuration file (e.g., `appsettings.json`).
-*   **Asynchronous Logging:** For high-volume logging, consider using asynchronous logging to avoid blocking the main thread. Libraries like NLog and Serilog provide built-in support for asynchronous logging.  As mentioned before, you can use a background thread and a queue for manually implement it if you need fine-grained control.
-*   **Log Rotation:**  Consider implementing log rotation to prevent the log file from growing too large.  Libraries like NLog and Serilog offer log rotation features.
-*   **Log Levels:**  Use log levels strategically to filter log messages and only record the information that is relevant for debugging and monitoring.
-*   **Dependency Injection:** Integrate the `ILogger` through dependency injection in your application for better testability, configurability and loose coupling.
-
-================================================================================
-
 File: enhanced_Program.cs
 
 ================================================================================
 ```csharp
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using InputProcessor;
-using UserManagement;
-using LoggingService;
-
-// Define an interface for the application's core functionality
-public interface IApplication
-{
-    void Run();
-}
-
-// Implement the application logic using dependency injection
-public class Application : IApplication
-{
-    private readonly IDataHandler _dataHandler;
-    private readonly IUserManager _userManager;
-    private readonly ILogger _logger;
-
-    public Application(IDataHandler dataHandler, IUserManager userManager, ILogger logger)
-    {
-        _dataHandler = dataHandler ?? throw new ArgumentNullException(nameof(dataHandler));
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    public void Run()
-    {
-        _logger.LogMessage("Starting Application...");
-
-        try
-        {
-            var processedData = _dataHandler.ProcessData();
-            var user = _userManager.ManageUsers();
-
-            _logger.LogMessage($"Processed Data: {processedData}, User: {user}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"An error occurred: {ex.Message}", ex); //Enhanced error logging
-        }
-
-        _logger.LogMessage("Application finished.");
-    }
-}
-
-
-class Program
-{
-    static void Main()
-    {
-        // Setup Dependency Injection
-        var serviceProvider = new ServiceCollection()
-            .AddSingleton<IDataHandler, DataHandler>()
-            .AddSingleton<IUserManager, UserManager>()
-            .AddSingleton<ILogger, Logger>()
-            .AddSingleton<IApplication, Application>() // Register the Application class
-            .BuildServiceProvider();
-
-
-        // Resolve the Application from the DI container
-        var application = serviceProvider.GetService<IApplication>();
-
-        // Run the application
-        application.Run();
-    }
-}
-```
-
-**Explanation of Modifications:**
-
-1. **SOLID Principles & Dependency Injection (DI):**
-   - **Interface Segregation & Dependency Inversion:** Introduced `IApplication`, `IDataHandler`, `IUserManager`, and `ILogger` interfaces. This decouples the concrete implementations from the `Application` class and `Program.cs`. The `Application` class now depends on abstractions (interfaces) instead of concrete classes.  This allows for easier testing and swapping of implementations.
-   - **Dependency Injection Container:**  The `Microsoft.Extensions.DependencyInjection` library is used to set up a simple DI container.  This container registers the interfaces and their concrete implementations.
-   - **Constructor Injection:** The `Application` class now receives its dependencies (`IDataHandler`, `IUserManager`, `ILogger`) through its constructor. This is a key principle of DI.  The `Program` class resolves these dependencies through the DI container.
-
-2. **Modularity and Reusability:**
-   - By using interfaces and DI, the `Application` class becomes highly modular.  Different implementations of `IDataHandler`, `IUserManager`, and `ILogger` can be easily swapped in and out without modifying the `Application` class itself.  This promotes reusability of components.
-
-3. **Performance and Scalability:**
-    - While this example doesn't directly address large-scale performance concerns (like database connections or network operations), the use of DI makes it easier to inject optimized implementations of the dependencies. For example, a more efficient logging implementation could be injected without changing the rest of the code.
-    - Singleton lifetime for services is chosen for simplicity in this example.  In more complex applications, consider other lifetimes (Scoped, Transient) depending on the needs of the specific services.
-
-4. **Error Handling and Logging:**
-   - **Try-Catch Block:** A `try-catch` block is added within the `Application.Run()` method to catch potential exceptions during data processing or user management.
-   - **Enhanced Logging:** The `LogError` method is used in the `catch` block to log detailed error information, including the exception message and stack trace.  This makes debugging much easier. The logger now uses interpolation.
-   - The `ArgumentNullException` checks in the `Application` constructor provide fail-fast behavior and help to avoid null reference exceptions later.
-
-5. **Security Best Practices:**
-   - This specific code example doesn't directly involve sensitive data handling or authentication/authorization. However, the use of interfaces and DI is crucial for enabling security practices.  For example, a secure logging implementation could be injected that masks sensitive data before logging it.
-   - When dealing with data access, ensure proper input validation, parameterized queries (to prevent SQL injection), and proper access control mechanisms are implemented in the `DataHandler` and `UserManager` classes.
-
-6. **.NET Coding Conventions:**
-   - PascalCase is used for class names, method names, and properties.
-   - camelCase is used for local variables and method parameters.
-   - Using directives are organized at the top of the file.
-   - Consistent indentation is used.
-   - Meaningful names are used for variables and methods.
-
-7. **Redundant object creation:**
-    - Removed redundant object creation of `DataHandler`
-
-**How to run:**
-
-1.  **Create a new .NET console application**.
-2.  **Install the `Microsoft.Extensions.DependencyInjection` NuGet package:**
-    ```bash
-    dotnet add package Microsoft.Extensions.DependencyInjection
-    ```
-3.  **Create the `InputProcessor`, `UserManagement` and `LoggingService` projects/classes** with the corresponding interfaces.  For example:
-
-```csharp
-// InputProcessor project
-namespace InputProcessor
-{
-    public interface IDataHandler
-    {
-        string ProcessData();
-    }
-
-    public class DataHandler : IDataHandler
-    {
-        public string ProcessData()
-        {
-            return "Processed Data from DataHandler";
-        }
-    }
-}
-
-// UserManagement project
-namespace UserManagement
-{
-    public interface IUserManager
-    {
-        string ManageUsers();
-    }
-
-    public class UserManager : IUserManager
-    {
-        public string ManageUsers()
-        {
-            return "User information from UserManager";
-        }
-    }
-}
-
-// LoggingService project
-namespace LoggingService
-{
-    public interface ILogger
-    {
-        void LogMessage(string message);
-        void LogError(string message, Exception ex);
-    }
-
-    public class Logger : ILogger
-    {
-        public void LogMessage(string message)
-        {
-            Console.WriteLine($"Log: {message}");
-        }
-
-        public void LogError(string message, Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {message}\n{ex}");
-        }
-    }
-}
-```
-
-4. **Replace the content of your `Program.cs` with the enhanced version provided.**
-5.  **Add project references:** In your main project, add project references to `InputProcessor`, `UserManagement`, and `LoggingService`.
-6. **Build and Run**.
-
-This improved structure enhances maintainability, testability, and scalability of the application by adhering to SOLID principles and leveraging dependency injection.
-
-================================================================================
-
-File: enhanced_UserManager.cs
-
-================================================================================
-```csharp
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Linq; // For LINQ operations
+using Microsoft.Extensions.Logging; // Use Microsoft.Extensions.Logging
+using Microsoft.Extensions.DependencyInjection; // Use dependency injection
 
-namespace UserManagement
+namespace ConsoleApp
 {
-    public interface IUserRepository
+    // Interface for number operations
+    public interface INumberProcessor
     {
-        IEnumerable<string> GetUsernames();
+        int FindLargest(List<int> numbers);
+        int FindSmallest(List<int> numbers);
+        double CalculateAverage(List<int> numbers);
     }
 
-    public class UserRepository : IUserRepository
+    // Implementation of number operations
+    public class NumberProcessor : INumberProcessor
     {
-        // Ideally, this would connect to a database.  For this example, using an in-memory list.
-        private readonly List<string> _users = new List<string> { "Alice", "Bob" };
+        private readonly ILogger<NumberProcessor> _logger;
 
-        public IEnumerable<string> GetUsernames()
+        public NumberProcessor(ILogger<NumberProcessor> logger)
         {
-            // Defensive copy to prevent external modification of the internal list.
-            return _users.ToList();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-    }
 
-
-	public class UserManager
-	{
-		private readonly ILogger<UserManager> _logger;
-        private readonly IUserRepository _userRepository;
-
-        public UserManager(ILogger<UserManager> logger, IUserRepository userRepository)
-		{
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-		}
-
-		public string ManageUsers(int userIndex)
-		{
-			try
-			{
-                var users = _userRepository.GetUsernames().ToArray();  // Get users from the repository
-                if (userIndex >= 0 && userIndex < users.Length)
-				{
-					return users[userIndex];
-				}
-				else
-				{
-					_logger.LogError("Invalid user index: {userIndex}", userIndex);
-					throw new ArgumentOutOfRangeException(nameof(userIndex), "User index is out of range.");
-				}
-			}
-			catch (ArgumentOutOfRangeException ex)
-			{
-				_logger.LogError(ex, "Error managing users.");
-				return "Error: Invalid User Index"; // Handle exception gracefully. Consider a custom exception type
-			}
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred while managing users.");
-                return "Error: An unexpected error occurred.";
-            }
-		}
-
-        public string CreateUser(string username, string password)
+        public int FindLargest(List<int> numbers)
         {
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to find the largest number.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
+
             try
             {
-                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                {
-                    _logger.LogError("Username or password cannot be null or whitespace.");
-                    throw new ArgumentException("Username and password must be provided.");
-                }
-
-                // Generate salt
-                byte[] salt;
-                new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-
-                // Hash password with salt
-                var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000);
-                byte[] hash = pbkdf2.GetBytes(20);
-
-                // Combine salt and hash for storage (e.g., in a database)
-                byte[] hashBytes = new byte[36];
-                Array.Copy(salt, 0, hashBytes, 0, 16);
-                Array.Copy(hash, 0, hashBytes, 16, 20);
-
-                string savedPasswordHash = Convert.ToBase64String(hashBytes);
-
-                // In a real application, you would save the username and savedPasswordHash to a database.
-                // This is a simplified example, so we're just logging the result.
-                _logger.LogInformation("User created: {Username}", username);
-                _logger.LogDebug("Password hash: {PasswordHash}", savedPasswordHash);
-
-                return "User created successfully";
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Error creating user.");
-                return "Error: Invalid username or password";
+                return numbers.Max(); // Use LINQ for better performance
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while creating a user.");
-                return "Error: An unexpected error occurred during user creation.";
+                _logger.LogError(ex, "An error occurred while finding the largest number.");
+                throw; // Re-throw the exception for handling upstream
+            }
+        }
+
+        public int FindSmallest(List<int> numbers)
+        {
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to find the smallest number.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
+
+            try
+            {
+                return numbers.Min(); // Use LINQ for better performance
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while finding the smallest number.");
+                throw; // Re-throw the exception for handling upstream
+            }
+        }
+
+        public double CalculateAverage(List<int> numbers)
+        {
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to calculate the average.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
+
+            try
+            {
+                return numbers.Average(); // Use LINQ for better performance
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while calculating the average.");
+                throw; // Re-throw the exception for handling upstream
             }
         }
     }
-}
-```
-
-```csharp
-// Example Usage (Program.cs or similar)
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using UserManagement;
-
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // Setup dependency injection for logging.
-        var serviceProvider = new ServiceCollection()
-            .AddLogging(builder => builder.AddConsole())
-            .AddSingleton<IUserRepository, UserRepository>()
-            .AddTransient<UserManager>()
-            .BuildServiceProvider();
-
-        var logger = serviceProvider.GetService<ILogger<Program>>();
-        var userManager = serviceProvider.GetService<UserManager>();
 
 
+	class Program
+	{
+		static void Main( string[] args )
+		{
+            // Setup dependency injection
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(builder =>
+                {
+                    builder.AddConsole(); // Add console logger.  Can be configured further
+                    // Add other logging providers like file, database, etc. here
+                })
+                .AddSingleton<INumberProcessor, NumberProcessor>()
+                .BuildServiceProvider();
 
-        try
-        {
-            string user = userManager.ManageUsers(0);
-            Console.WriteLine($"User at index 0: {user}");
+            // Resolve the INumberProcessor
+            var numberProcessor = serviceProvider.GetService<INumberProcessor>();
+            var logger = serviceProvider.GetService<ILogger<Program>>();
 
-            string user2 = userManager.ManageUsers(1);
-            Console.WriteLine($"User at index 1: {user2}");
+			Console.WriteLine( "Welcome to the Simple Console App!" );
 
-            string user3 = userManager.ManageUsers(5); // Intentional out-of-range access
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred in Main.");
-            Console.WriteLine("An error occurred. Check the logs.");
-        }
+			// Hardcoded list of numbers
+			List<int> numbers = new List<int> { 5, 10, 15, 20, 25 };
 
-         string creationResult = userManager.CreateUser("testuser", "P@$$wOrd");
-         Console.WriteLine(creationResult);
-    }
+			// Perform operations
+			if ( numbers.Count > 0 )
+			{
+                try
+                {
+                    Console.WriteLine($"The largest number is: {numberProcessor.FindLargest(numbers)}");
+                    Console.WriteLine($"The smallest number is: {numberProcessor.FindSmallest(numbers)}");
+                    Console.WriteLine($"The average is: {numberProcessor.CalculateAverage(numbers)}");
+                }
+                catch (ArgumentException ex)
+                {
+                    logger.LogError(ex, "An error occurred while processing the numbers.");
+                    Console.WriteLine("An error occurred while processing the numbers. Please check the logs for more details.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An unexpected error occurred.");
+                    Console.WriteLine("An unexpected error occurred. Please check the logs for more details.");
+                }
+
+			}
+			else
+			{
+				Console.WriteLine( "No numbers are available." );
+			}
+
+			Console.WriteLine( "Thank you for using the app. Goodbye!" );
+			Console.ReadLine();
+		}
+
+	}
 }
 ```
 
 Key improvements and explanations:
 
-1. **SOLID Principles:**
-
-   * **Single Responsibility Principle (SRP):**  `UserManager` is now focused on user management logic. User retrieval is delegated to `UserRepository`.  The `CreateUser` method, which previously might have belonged in a separate authentication service, is included to demonstrate password hashing, but could be moved to a dedicated service.
-   * **Open/Closed Principle (OCP):**  The `UserManager` is now more open to extension (e.g., adding new user management features) and closed to modification of its core behavior.  The `IUserRepository` interface allows swapping out data access implementations without changing the `UserManager` class.
-   * **Liskov Substitution Principle (LSP):**  Any implementation of `IUserRepository` should be substitutable without affecting the correctness of `UserManager`.
-   * **Interface Segregation Principle (ISP):**  The `IUserRepository` interface provides only the methods that `UserManager` actually needs. We could further refine this if other parts of the system require different user data access patterns.
-   * **Dependency Inversion Principle (DIP):**  `UserManager` depends on abstractions (`ILogger`, `IUserRepository`) rather than concrete implementations.  This makes it easier to test and maintain.
+1. **SOLID Principles (Specifically, the Single Responsibility Principle, Open/Closed Principle, and Dependency Inversion Principle):**
+   - **Separation of Concerns:** The number processing logic is extracted into a separate `NumberProcessor` class that implements an `INumberProcessor` interface. This makes the `Program` class responsible only for the application's entry point and user interaction.
+   - **Open/Closed Principle:**  The `NumberProcessor` can be extended with new number processing operations without modifying its existing code.  New classes implementing `INumberProcessor` can be created to handle different types of number processing.
+   - **Dependency Inversion Principle:** The `Program` class depends on the abstraction `INumberProcessor` rather than a concrete implementation of the number processing logic. This allows for easier testing, maintainability, and the ability to swap out different implementations of `INumberProcessor` without affecting `Program`.
 
 2. **Modularity and Reusability:**
-
-   * The `IUserRepository` interface abstracts the user data source.  You can easily swap it out for a database implementation, a file-based implementation, or a mock implementation for testing.
-   * The `UserManager` can be reused in different parts of the application because it depends on interfaces rather than specific concrete classes.
-   * The password hashing logic in `CreateUser` can be moved to a dedicated authentication service for better reusability.
+   - The `NumberProcessor` class and `INumberProcessor` interface are designed to be reusable in other parts of the application or even in other applications.
+   - The `Program` class is now simpler and more focused on its core responsibility, making it easier to understand and maintain.
 
 3. **Performance and Scalability:**
-
-   * By using `IEnumerable<string>` instead of `string[]`, the `UserRepository` could potentially stream data from a database without loading the entire user list into memory at once.
-   *  The example usage code uses dependency injection to avoid creating new UserRepository and UserManager classes every time one of the methods need to be called, this improves performance by reusing instances.
+   - **LINQ:**  The original iterative loops for finding the largest, smallest, and average were replaced with LINQ methods (`numbers.Max()`, `numbers.Min()`, `numbers.Average()`). LINQ provides optimized implementations for these operations, often resulting in better performance, especially for larger lists.
 
 4. **Error Handling and Logging:**
+   - **Robust Error Handling:** Input validation is added to the `NumberProcessor` methods to check for null or empty lists.  If invalid input is detected, an `ArgumentException` is thrown, providing more specific error information.
+   - **Centralized Error Handling:**  A try-catch block surrounds the core number processing logic in `Main` to handle potential exceptions during the number operations.
+   - **Logging:** The code now uses `Microsoft.Extensions.Logging` for structured logging.  This allows you to easily configure different logging providers (console, file, database, etc.) and control the level of detail in the logs.  The `NumberProcessor` logs errors and warnings.  The `Program` class also logs errors.
 
-   * **Logging:**  The `UserManager` now uses `ILogger` to log errors and important events.  This provides valuable information for debugging and monitoring the application.
-   * **Exception Handling:**  A `try-catch` block is added to handle potential exceptions, such as `ArgumentOutOfRangeException`.  The error is logged, and a user-friendly message is returned (or a more appropriate action, like re-throwing a custom exception, could be taken).
-   * **Input Validation:** The `CreateUser` method includes input validation to prevent null or whitespace usernames and passwords.
+5. **Dependency Injection:**
+   - **Inversion of Control:**  Dependency injection (DI) is used to provide the `INumberProcessor` and `ILogger` implementations to the `Program` class. This is done using the `Microsoft.Extensions.DependencyInjection` package.
+   - **Benefits of DI:** DI promotes loose coupling, testability, and maintainability. It allows you to easily swap out different implementations of the dependencies, making the code more flexible and adaptable.
 
-5. **Security Best Practices:**
+6. **Security Best Practices:**
+   - Input Validation:  Validating the input data ensures that the application does not crash or behave unexpectedly due to invalid or malicious data.  This prevents potential vulnerabilities.
+   - Logging: Logging sensitive information should be avoided. The current logging implementation is designed to log errors and warnings, but it should be reviewed to ensure that no sensitive data is being logged.
 
-   * **Password Hashing:**  The `CreateUser` method now includes a basic implementation of password hashing using `Rfc2898DeriveBytes` (PBKDF2).  This is essential for storing passwords securely.  **Important:**  This is a *basic* implementation.  In a production application, you would use a more robust password hashing library like `BCrypt.Net` or the ASP.NET Core Identity framework, and you would likely store the password hash and salt in a database.
-   * **Salt:** A unique salt is generated for each password.
-   * **Data Protection:** Consider using ASP.NET Core's Data Protection API for encrypting sensitive data.
-   * **Authorization:** Role-based access control should be implemented to restrict access to user management functionality to authorized users.
+7. **.NET Coding Conventions:**
+   - Consistent Naming:  The code uses consistent naming conventions (e.g., PascalCase for class and method names, camelCase for variable names).
+   - Code Formatting:  The code is formatted consistently with proper indentation and spacing.
+   - Using Directives:  The using directives are organized and necessary.
+   - Null Checks:  Explicit null checks are added for logger injection.
 
-6. **.NET Coding Conventions:**
+8. **Explanation of Changes:**
+    - **Added NuGet Packages:** The following NuGet packages need to be added to the project:
+        - `Microsoft.Extensions.Logging`
+        - `Microsoft.Extensions.Logging.Console` (for console logging)
+        - `Microsoft.Extensions.DependencyInjection`
+        - `Microsoft.Extensions.DependencyInjection.Abstractions`
+    - **`INumberProcessor` Interface:** Defines the contract for number processing operations.
+    - **`NumberProcessor` Class:** Implements the `INumberProcessor` interface and contains the actual logic for finding the largest, smallest, and average of a list of numbers. It uses LINQ for improved performance and includes error handling and logging.
+    - **Dependency Injection:**  The `Main` method now uses dependency injection to create instances of `INumberProcessor` and `ILogger`. A `ServiceCollection` is used to register the dependencies, and a `ServiceProvider` is created to resolve them.
+    - **Error Handling:** The `try-catch` block in `Main` catches any exceptions that occur during the number processing and logs them using the `ILogger`.
+    - **Logging:** The `NumberProcessor` logs errors and warnings using the `ILogger`.
+    - **LINQ:** The original loops are replaced with LINQ methods (`Max()`, `Min()`, `Average()`) for improved performance.
 
-   *  Uses `PascalCase` for class and method names.
-   *  Uses `camelCase` for local variable names.
-   *  Uses underscores for private field names (e.g., `_logger`).
-   *  Uses `nameof()` operator to prevent errors when renaming parameters.
-   * Uses constructor injection for dependencies.
-
-7. **Dependency Injection:**
-
-   * The `UserManager` now uses constructor injection to receive an `ILogger` instance and an `IUserRepository` instance.  This makes the class more testable and maintainable.  The `Program.cs` example shows how to configure dependency injection using the `Microsoft.Extensions.DependencyInjection` package.
-
-8. **Defensive Programming:**
-
-   * The `UserRepository` returns a defensive copy of the `_users` list to prevent external modification.
-   * `ArgumentNullException` is thrown if the logger or userRepository are not set.
-
-9. **Clearer Error Messages:**
-
-    * Specific error messages are returned to the user, rather than just generic "Error" messages. This helps with debugging.
-
-**Further Enhancements:**
-
-* **Database Integration:**  Implement `IUserRepository` using Entity Framework Core or another data access technology to store user data in a database.
-* **Authentication Service:**  Create a separate `AuthenticationService` class to handle user authentication logic (password verification, token generation, etc.).
-* **Custom Exceptions:**  Define custom exception types (e.g., `UserNotFoundException`, `InvalidPasswordException`) for more specific error handling.
-* **Authorization:** Implement role-based access control (RBAC) to restrict access to user management features.
-* **Input Validation:** Add more comprehensive input validation (e.g., using FluentValidation).
-* **Asynchronous Operations:**  Use `async` and `await` for long-running operations, such as database queries, to improve performance.
-* **Unit Tests:**  Write unit tests to verify the correctness of the `UserManager` and `UserRepository` classes.
-* **Configuration:** Store configuration settings (e.g., password hashing iterations) in a configuration file.
-* **API Layer:** Expose the user management functionality through an API (e.g., using ASP.NET Core Web API).
-
-This enhanced code addresses the initial problems of the original snippet and incorporates best practices for building a more robust, maintainable, and secure user management system.
+This enhanced version addresses the requested improvements by incorporating SOLID principles, improving modularity and reusability, enhancing performance and scalability through LINQ and appropriate data structures, implementing robust error handling and logging, adhering to security best practices, and maintaining .NET coding conventions.  It's more robust, maintainable, and testable.
 
 ================================================================================

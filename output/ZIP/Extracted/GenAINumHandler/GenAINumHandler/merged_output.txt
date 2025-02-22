@@ -1,87 +1,68 @@
-===== DataHandler.cs (/tmp/tmp16c00i1v/GenAINumHandler/InputProcessor/DataHandler.cs) =====
+===== Program.cs (/tmp/tmp3ziv2gmc/NumberDetails/Program.cs) =====
 ﻿using System;
+using System.Collections.Generic;
 
-namespace InputProcessor
+namespace ConsoleApp
 {
-	public class DataHandler
+	class Program
 	{
-		private int num1 = 10;
-		private int num2 = 20;
-		private int[] dataArray = new int[ 1000000 ]; // Unused memory allocation
-
-		public int ProcessData()
+		static void Main( string[] args )
 		{
-			Console.WriteLine( "Processing Data..." );
-			for ( int i = 0; i < 100000; i++ ) // Unnecessary large loop
+			Console.WriteLine( "Welcome to the Simple Console App!" );
+
+			// Hardcoded list of numbers
+			List<int> numbers = new List<int> { 5, 10, 15, 20, 25 };
+
+			// Perform operations
+			if ( numbers.Count > 0 )
 			{
-				Console.WriteLine( "Iteration: " + i );
+				Console.WriteLine( $"The largest number is: {FindLargest( numbers )}" );
+				Console.WriteLine( $"The smallest number is: {FindSmallest( numbers )}" );
+				Console.WriteLine( $"The average is: {CalculateAverage( numbers )}" );
 			}
-			int result = num1 + num2;
-			Console.WriteLine( "Calculated Result: " + result );
-			return result;
+			else
+			{
+				Console.WriteLine( "No numbers are available." );
+			}
+
+			Console.WriteLine( "Thank you for using the app. Goodbye!" );
+			Console.ReadLine();
 		}
-	}
-}
 
-================================================================================
-
-===== Logger.cs (/tmp/tmp16c00i1v/GenAINumHandler/LoggingService/Logger.cs) =====
-﻿namespace LoggingService
-{
-	public class Logger
-	{
-		public void LogMessage( string message )
+		static int FindLargest( List<int> numbers )
 		{
-			System.IO.StreamWriter writer = new System.IO.StreamWriter( "log.txt" ); // No using statement, potential memory leak
-			writer.WriteLine( "Logging started..." );
-			writer.WriteLine( message );
-			writer.Close();
+			int largest = int.MinValue;
+			foreach ( int num in numbers )
+			{
+				if ( num > largest )
+					largest = num;
+			}
+			return largest;
 		}
-	}
-}
 
-================================================================================
-
-===== UserManager.cs (/tmp/tmp16c00i1v/GenAINumHandler/UserManager/UserManager.cs) =====
-﻿namespace UserManagement
-{
-	public class UserManager
-	{
-		public string ManageUsers()
+		static int FindSmallest( List<int> numbers )
 		{
-			string[] users = { "Alice", "Bob" };
-			return users[ 5 ]; // Index out of bounds, no error handling
+			int smallest = int.MaxValue;
+			foreach ( int num in numbers )
+			{
+				if ( num < smallest )
+					smallest = num;
+			}
+			return smallest;
+		}
+
+		static double CalculateAverage( List<int> numbers )
+		{
+			int sum = 0;
+			foreach ( int num in numbers )
+			{
+				sum += num;
+			}
+			return ( double )sum / numbers.Count;
 		}
 	}
 }
 
-================================================================================
-
-===== Program.cs (/tmp/tmp16c00i1v/GenAINumHandler/DataProcessorMain/Program.cs) =====
-﻿using System;
-using InputProcessor;
-using UserManagement;
-using LoggingService;
-class Program
-{
-	static void Main()
-	{
-		Console.WriteLine( "Starting Application..." );
-
-		DataHandler dataHandler = new DataHandler();
-		var processedData = dataHandler.ProcessData();
-
-		UserManager userManager = new UserManager();
-		var user = userManager.ManageUsers();
-
-		Logger logger = new Logger();
-		logger.LogMessage( "Processed Data: " + processedData + " User: " + user );
-
-		// Redundant object creation
-		dataHandler = new DataHandler();
-		dataHandler.ProcessData();
-	}
-}
 
 ================================================================================
 

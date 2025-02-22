@@ -1,125 +1,140 @@
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using InputProcessor;
-using UserManagement;
-using LoggingService;
+using System.Collections.Generic;
+using System.Linq; // For LINQ operations
+using Microsoft.Extensions.Logging; // Use Microsoft.Extensions.Logging
+using Microsoft.Extensions.DependencyInjection; // Use dependency injection
 
-// Define an interface for the application's core functionality
-public interface IApplication
+namespace ConsoleApp
 {
-    void Run();
-}
-
-// Implement the application logic using dependency injection
-public class Application : IApplication
-{
-    private readonly IDataHandler _dataHandler;
-    private readonly IUserManager _userManager;
-    private readonly ILogger _logger;
-
-    public Application(IDataHandler dataHandler, IUserManager userManager, ILogger logger)
+    // Interface for number operations
+    public interface INumberProcessor
     {
-        _dataHandler = dataHandler ?? throw new ArgumentNullException(nameof(dataHandler));
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        int FindLargest(List<int> numbers);
+        int FindSmallest(List<int> numbers);
+        double CalculateAverage(List<int> numbers);
     }
 
-    public void Run()
+    // Implementation of number operations
+    public class NumberProcessor : INumberProcessor
     {
-        _logger.LogMessage("Starting Application...");
+        private readonly ILogger<NumberProcessor> _logger;
 
-        try
+        public NumberProcessor(ILogger<NumberProcessor> logger)
         {
-            var processedData = _dataHandler.ProcessData();
-            var user = _userManager.ManageUsers();
-
-            _logger.LogMessage($"Processed Data: {processedData}, User: {user}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"An error occurred: {ex.Message}", ex); //Enhanced error logging
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        _logger.LogMessage("Application finished.");
-    }
-}
-
-
-class Program
-{
-    static void Main()
-    {
-        // Setup Dependency Injection
-        var serviceProvider = new ServiceCollection()
-            .AddSingleton<IDataHandler, DataHandler>()
-            .AddSingleton<IUserManager, UserManager>()
-            .AddSingleton<ILogger, Logger>()
-            .AddSingleton<IApplication, Application>() // Register the Application class
-            .BuildServiceProvider();
-
-
-        // Resolve the Application from the DI container
-        var application = serviceProvider.GetService<IApplication>();
-
-        // Run the application
-        application.Run();
-    }
-}
-
-
-// InputProcessor project
-namespace InputProcessor
-{
-    public interface IDataHandler
-    {
-        string ProcessData();
-    }
-
-    public class DataHandler : IDataHandler
-    {
-        public string ProcessData()
+        public int FindLargest(List<int> numbers)
         {
-            return "Processed Data from DataHandler";
-        }
-    }
-}
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to find the largest number.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
 
-// UserManagement project
-namespace UserManagement
-{
-    public interface IUserManager
-    {
-        string ManageUsers();
-    }
-
-    public class UserManager : IUserManager
-    {
-        public string ManageUsers()
-        {
-            return "User information from UserManager";
-        }
-    }
-}
-
-// LoggingService project
-namespace LoggingService
-{
-    public interface ILogger
-    {
-        void LogMessage(string message);
-        void LogError(string message, Exception ex);
-    }
-
-    public class Logger : ILogger
-    {
-        public void LogMessage(string message)
-        {
-            Console.WriteLine($"Log: {message}");
+            try
+            {
+                return numbers.Max(); // Use LINQ for better performance
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while finding the largest number.");
+                throw; // Re-throw the exception for handling upstream
+            }
         }
 
-        public void LogError(string message, Exception ex)
+        public int FindSmallest(List<int> numbers)
         {
-            Console.Error.WriteLine($"Error: {message}\n{ex}");
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to find the smallest number.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
+
+            try
+            {
+                return numbers.Min(); // Use LINQ for better performance
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while finding the smallest number.");
+                throw; // Re-throw the exception for handling upstream
+            }
+        }
+
+        public double CalculateAverage(List<int> numbers)
+        {
+            if (numbers == null || numbers.Count == 0)
+            {
+                _logger.LogError("The list of numbers is null or empty when trying to calculate the average.");
+                throw new ArgumentException("List of numbers cannot be null or empty.");
+            }
+
+            try
+            {
+                return numbers.Average(); // Use LINQ for better performance
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while calculating the average.");
+                throw; // Re-throw the exception for handling upstream
+            }
         }
     }
+
+
+	class Program
+	{
+		static void Main( string[] args )
+		{
+            // Setup dependency injection
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(builder =>
+                {
+                    builder.AddConsole(); // Add console logger.  Can be configured further
+                    // Add other logging providers like file, database, etc. here
+                })
+                .AddSingleton<INumberProcessor, NumberProcessor>()
+                .BuildServiceProvider();
+
+            // Resolve the INumberProcessor
+            var numberProcessor = serviceProvider.GetService<INumberProcessor>();
+            var logger = serviceProvider.GetService<ILogger<Program>>();
+
+			Console.WriteLine( "Welcome to the Simple Console App!" );
+
+			// Hardcoded list of numbers
+			List<int> numbers = new List<int> { 5, 10, 15, 20, 25 };
+
+			// Perform operations
+			if ( numbers.Count > 0 )
+			{
+                try
+                {
+                    Console.WriteLine($"The largest number is: {numberProcessor.FindLargest(numbers)}");
+                    Console.WriteLine($"The smallest number is: {numberProcessor.FindSmallest(numbers)}");
+                    Console.WriteLine($"The average is: {numberProcessor.CalculateAverage(numbers)}");
+                }
+                catch (ArgumentException ex)
+                {
+                    logger.LogError(ex, "An error occurred while processing the numbers.");
+                    Console.WriteLine("An error occurred while processing the numbers. Please check the logs for more details.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An unexpected error occurred.");
+                    Console.WriteLine("An unexpected error occurred. Please check the logs for more details.");
+                }
+
+			}
+			else
+			{
+				Console.WriteLine( "No numbers are available." );
+			}
+
+			Console.WriteLine( "Thank you for using the app. Goodbye!" );
+			Console.ReadLine();
+		}
+
+	}
 }
