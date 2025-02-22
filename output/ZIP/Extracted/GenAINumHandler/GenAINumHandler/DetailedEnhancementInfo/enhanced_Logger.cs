@@ -1,99 +1,127 @@
 ```csharp
 using System;
 using System.IO;
-using Microsoft.Extensions.Logging;
 
 namespace LoggingService
 {
-    public interface IAppLogger
+    public interface ILogger
     {
-        void LogInformation(string message);
+        void LogMessage(string message);
+        void LogError(string message, Exception ex = null);
         void LogWarning(string message);
-        LogError(string message, Exception ex = null);
+        void LogInformation(string message);
     }
 
-    public class AppLogger : IAppLogger
+    public class FileLogger : ILogger, IDisposable
     {
-        private readonly ILogger _logger;
         private readonly string _logFilePath;
+        private StreamWriter _writer;
+        private bool _disposed = false;
 
-        public AppLogger(ILogger<AppLogger> logger, string logFilePath = "app.log") // Inject ILogger and allow configurable log file path
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath)); ; // Default log file path
-            EnsureLogFileExists();
-        }
 
-        private void EnsureLogFileExists()
+        public FileLogger(string logFilePath = "log.txt")
         {
+            _logFilePath = logFilePath;
             try
             {
-                if (!File.Exists(_logFilePath))
-                {
-                    // Create the file if it doesn't exist
-                    using (File.Create(_logFilePath)) { } // Create and immediately dispose to release the handle.
-                }
+                // Append to the log file if it exists. Create if it doesn't.
+                _writer = new StreamWriter(_logFilePath, true);
+                _writer.AutoFlush = true; // Ensures data is written immediately.
+                LogInformation("Logger initialized."); // Log initialization
             }
             catch (Exception ex)
             {
-                //If the log file can't be created, log it to the Console
-                Console.WriteLine($"Error creating log file: {ex.Message}");
-                Console.Error.WriteLine($"Error creating log file: {ex.Message}");
+                // Handle the exception, potentially logging to a fallback logger or re-throwing
+                Console.Error.WriteLine($"Error initializing FileLogger: {ex.Message}");
+                throw; // Re-throw to indicate initialization failure
             }
         }
 
+        public void LogMessage(string message)
+        {
+            LogInformation(message); // Default to information level
+        }
 
         public void LogInformation(string message)
         {
-            Log(LogLevel.Information, message);
+            Log($"INFO: {message}");
         }
 
         public void LogWarning(string message)
         {
-            Log(LogLevel.Warning, message);
+            Log($"WARN: {message}");
         }
 
         public void LogError(string message, Exception ex = null)
         {
-            Log(LogLevel.Error, message, ex);
+            if (ex == null)
+            {
+                Log($"ERROR: {message}");
+            }
+            else
+            {
+                Log($"ERROR: {message} Exception: {ex}");
+            }
         }
 
-        private void Log(LogLevel logLevel, string message, Exception ex = null)
+        private void Log(string message)
         {
+            if (_disposed) return; // Prevent logging after disposal
+
             try
             {
-                string logEntry = $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [{logLevel}] {message}";
-
-                if (ex != null)
+                //Thread safety (simple locking)
+                lock (_writer)
                 {
-                    logEntry += $"\nException: {ex.Message}\nStack Trace: {ex.StackTrace}";
+                    _writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
                 }
+            }
+            catch (ObjectDisposedException)
+            {
+                Console.Error.WriteLine("Logger has been disposed.  Cannot write to log.");
+            }
+            catch (Exception ex)
+            {
+                //Handle logging failure gracefully
+                Console.Error.WriteLine($"Error writing to log file: {ex.Message}");
+            }
+        }
 
-                _logger.Log(logLevel, logEntry); //Use the injected logger
 
-                //Append to file.  Uses a try/catch to prevent crashes if the log file can't be written to for any reason
-                try
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
                 {
-                    using (var writer = File.AppendText(_logFilePath))
+                    // Dispose managed resources.
+                    if (_writer != null)
                     {
-                        writer.WriteLine(logEntry);
+                        _writer.Flush(); // Flush before closing
+                        _writer.Close();
+                        _writer.Dispose();
+                        _writer = null;
                     }
                 }
-                catch (Exception fileEx)
-                {
-                    _logger.LogError($"Error writing to log file: {fileEx.Message}");
-                    // Fallback: If writing to the log file fails, write to console.
-                    Console.WriteLine($"Error writing to log file, falling back to console: {fileEx.Message}");
-                    Console.Error.WriteLine(logEntry);
-                }
-            }
-            catch (Exception overallEx)
-            {
-                //In the very rare event that logging fails completely, log it to the console
-                Console.WriteLine($"FATAL: Logging failed: {overallEx.Message}");
-                Console.Error.WriteLine($"FATAL: Logging failed: {overallEx.Message}");
-            }
 
+                // Dispose unmanaged resources, if any.
+
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        ~FileLogger()
+        {
+            // Finalizer to ensure resources are released even if Dispose isn't called.
+            Dispose(disposing: false);
         }
     }
 }
@@ -101,75 +129,76 @@ namespace LoggingService
 
 **Explanation of Modifications:**
 
-1.  **Interface `IAppLogger`:** Introduced an interface `IAppLogger` to define the contract for logging operations. This adheres to the Dependency Inversion Principle (DIP) and allows for easy swapping of logging implementations.  It promotes loose coupling.
+1.  **SOLID Principles:**
+    *   **Interface Segregation (I):**  Introduced an `ILogger` interface.  This allows for multiple logger implementations (e.g., FileLogger, ConsoleLogger, DatabaseLogger) and clients only depend on the interface, not specific implementations.  This promotes loose coupling. The interface defines several levels of logging, information, warning, error, and simple message.
+    *   **Open/Closed Principle (O):** By using the `ILogger` interface, we can extend the logging functionality by adding new logger implementations without modifying existing code that uses the `ILogger` interface.
+    *   **Liskov Substitution Principle (L):** Any class that implements `ILogger` can be used interchangeably without affecting the correctness of the program.
+    *   **Dependency Inversion Principle (D):** High-level modules (the code using the logger) should not depend on low-level modules (the FileLogger). Both should depend on abstractions (ILogger).  This is achieved through dependency injection.  The consuming code would receive an `ILogger` instance via constructor injection.
 
-2.  **Class `AppLogger`:** Implements the `IAppLogger` interface.  This is the concrete implementation of our logger.
+2.  **Modularity and Reusability:**
+    *   The `ILogger` interface promotes modularity.  Different logging implementations can be swapped in and out easily.
+    *   The `FileLogger` class is now a reusable component.
 
-3.  **Dependency Injection:** The `AppLogger` constructor now accepts an `ILogger<AppLogger>` instance via dependency injection.  This uses the built-in .NET logging framework which is much more robust than a simple `StreamWriter`.  It adheres to DIP and promotes testability.  Also, it takes in an optional `logFilePath` so we can configure where the log files get stored.
+3.  **Performance and Scalability:**
+    *   **`AutoFlush = true`**:  Forces the `StreamWriter` to flush its buffer after each write operation. While this decreases performance slightly due to increased disk I/O, it's crucial for reliability and ensuring logs are written in near real-time, especially in case of application crashes or unexpected terminations.  Without `AutoFlush`, data in the buffer might be lost.
+    *   **Thread Safety:** Added a `lock` statement around the write operation to make it thread-safe.  This is essential in multi-threaded applications to prevent data corruption.
+    *   **Buffering Consideration (Not implemented in this example, but important to consider):**  For high-volume logging, consider using a background worker thread and a queue to handle log writes asynchronously. This prevents the logging from blocking the main thread and improves performance.  Libraries like `NLog` and `Serilog` provide this functionality out of the box.
 
-4.  **`Microsoft.Extensions.Logging`:** Leverages the built-in .NET logging infrastructure for more advanced logging features (log levels, categories, etc.).  This replaces the simple `Console.WriteLine` approach with more structured logging.
+4.  **Error Handling and Logging:**
+    *   **Exception Handling:** Added a `try-catch` block within the `Log` method to handle potential exceptions during file writing.  This prevents the entire application from crashing if there's an issue with the log file.
+    *   **Robust Error Reporting:**  The `LogError` method now takes an `Exception` object as input and includes the exception details in the log message. This provides valuable debugging information.  Also, added error logging during the initialization of the FileLogger to catch potential issues during the logger's setup.
+    *   **Fallback Mechanism:**  The `catch` block in the `Log` method logs any errors to `Console.Error` as a fallback mechanism if writing to the log file fails.
+    *   **Initialization Logging:** Logs an informative message when the logger is initialized to confirm its correct setup.
 
-5.  **Log Levels:** Introduced `LogInformation`, `LogWarning`, and `LogError` methods, each mapping to a specific log level defined in `Microsoft.Extensions.Logging.LogLevel`. This allows for filtering logs based on severity.
+5.  **Security Best Practices:**
+    *   **Path Validation (Not implemented but crucial in real-world scenarios):**  Before using the `logFilePath`, you should validate it to prevent directory traversal attacks or other security vulnerabilities.
+    *   **Permissions:**  Ensure that the application has the necessary permissions to write to the specified log file location.
+    *   **Sensitive Data:**  Be cautious about logging sensitive data (e.g., passwords, API keys). Consider masking or encrypting such data before logging it.
 
-6.  **Exception Handling:** The `LogError` method now accepts an optional `Exception` object, allowing you to log exception details along with the message.  The logging mechanism handles `Exception` objects now.
+6.  **.NET Coding Conventions:**
+    *   **`using` statement replaced with explicit `Dispose()` call (now through IDisposable implementation):** This ensures that the `StreamWriter` is properly closed and resources are released, even if an exception occurs. Now implements the IDisposable interface which contains a finalizer that guarantees the resource disposal.
+    *   **Naming Conventions:** Followed standard .NET naming conventions (e.g., camelCase for local variables, PascalCase for method names).
+    *   **Code Formatting:**  Improved code formatting for readability.
+    *   **Readonly field**: LogFilePath is now a readonly field and the constructor initializes the field with a default value
+    *   **Dispose Pattern**: Implementation of the dispose pattern to ensure resources are released properly.
 
-7.  **`using` statement (or equivalent):**  Replaced `writer.Close()` with a `using` statement around the `StreamWriter`.  This ensures that the file stream is properly disposed of, even if exceptions occur, preventing potential file locking issues and resource leaks. The `EnsureLogFileExists()` method uses `using` statement too, to ensure the file handle is released.
+7.  **Logging Levels:**
+    *   The `ILogger` interface defines different logging levels (Information, Warning, Error). This allows you to filter log messages based on their severity.  The `LogMessage` defaults to `LogInformation`.
 
-8.  **Configurable Log File Path:** The log file path is now configurable via the constructor, allowing for greater flexibility.
+8. **Disposal Pattern Implementation:**
+    *  The implementation of `IDisposable` ensures the StreamWriter is properly closed and resources are released. The finalizer is present as a safety net for when dispose() hasn't been explicitly called.
 
-9.  **Error Handling around File Operations:** Added comprehensive `try-catch` blocks around file creation and writing operations. This prevents application crashes if the log file is inaccessible or if there are permission issues.  Error messages are logged to the console as a fallback.
+**How to use:**
 
-10. **Thread Safety (Consideration):**  While the provided code doesn't explicitly handle multi-threading, the use of `File.AppendText` within a `using` statement provides some level of thread safety for appending to the log file. However, for high-volume, multi-threaded scenarios, a dedicated logging library with built-in thread safety mechanisms (e.g., `ConcurrentQueue` and a background thread) is recommended.
-
-11. **Date/Time Stamp:** Added a date/time stamp to each log entry for better traceability.
-
-12. **SOLID Principles:**
-    *   **Single Responsibility Principle (SRP):**  The `AppLogger` class focuses solely on logging.  The logic responsible for file creation is separated into `EnsureLogFileExists`
-    *   **Open/Closed Principle (OCP):** The `AppLogger` can be extended with new logging functionalities without modifying its core implementation.
-    *   **Liskov Substitution Principle (LSP):**  `AppLogger` can be substituted with any other class that implements `IAppLogger` without affecting the correctness of the program.
-    *   **Interface Segregation Principle (ISP):** The `IAppLogger` interface is specific to logging operations.
-    *   **Dependency Inversion Principle (DIP):** The `AppLogger` depends on abstractions (`ILogger`, `IAppLogger`) rather than concrete implementations.
-
-13. **Maintain .NET Coding Conventions:** Code is formatted according to standard .NET conventions (PascalCase for class and method names, camelCase for variables, etc.).
-
-14. **Log file creation:** A method to create a log file is added to create a log file only if it doesn't already exist.
-
-15. **Fallback to console:** Adds fallback to the console output stream should the log files be inaccessible for some reason.
-
-**How to Use:**
-
-1.  **Dependency Injection:**  Register `IAppLogger` and `ILogger` in your dependency injection container.  For example, in a .NET Core application:
-
-    ```csharp
-    builder.Services.AddSingleton<IAppLogger, AppLogger>();
-    builder.Services.AddLogging(configure => configure.AddConsole()); // Adds console logger
-    builder.Services.AddSingleton<ILogger<AppLogger>>(provider => provider.GetRequiredService<ILoggerFactory>().CreateLogger<AppLogger>());
-    ```
-
-2.  **Inject `IAppLogger`:** Inject `IAppLogger` into the classes where you need to log messages.
-
-    ```csharp
-    public class MyService
+```csharp
+// Example Usage (Dependency Injection is recommended)
+using (ILogger logger = new FileLogger("my_app.log"))
+{
+    try
     {
-        private readonly IAppLogger _logger;
-
-        public MyService(IAppLogger logger)
-        {
-            _logger = logger;
-        }
-
-        public void DoSomething()
-        {
-            try
-            {
-                // ... some code that might throw an exception ...
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("An error occurred while doing something.", ex);
-            }
-        }
+        // Some code that might throw an exception
+        int result = 10 / 0; // This will throw a DivideByZeroException
     }
-    ```
+    catch (Exception ex)
+    {
+        logger.LogError("An error occurred during calculation.", ex);
+    }
 
-This revised implementation addresses the issues of the original code, provides a more robust and flexible logging solution, and adheres to best practices and SOLID principles. It leverages the standard .NET logging framework and provides clear separation of concerns.
+    logger.LogInformation("Application started.");
+    logger.LogWarning("Low disk space detected.");
+    logger.LogMessage("This is just a message.");  //Defaults to INFO level
+}
+
+//Outside the using block, the logger is automatically disposed of.
+```
+
+**Key Improvements and Considerations:**
+
+*   **Reliability:**  The `AutoFlush` setting, the `try-catch` blocks, and the thread safety mechanisms significantly improve the reliability of the logging system.
+*   **Maintainability:**  The use of the `ILogger` interface and the separation of concerns make the code easier to maintain and extend.
+*   **Testability:**  The `ILogger` interface allows you to mock the logger in unit tests, making it easier to test your code in isolation.
+*   **Configuration:**  In a real-world application, you would typically configure the log file path and other logging parameters through a configuration file (e.g., `appsettings.json`).
+*   **Asynchronous Logging:** For high-volume logging, consider using asynchronous logging to avoid blocking the main thread. Libraries like NLog and Serilog provide built-in support for asynchronous logging.  As mentioned before, you can use a background thread and a queue for manually implement it if you need fine-grained control.
+*   **Log Rotation:**  Consider implementing log rotation to prevent the log file from growing too large.  Libraries like NLog and Serilog offer log rotation features.
+*   **Log Levels:**  Use log levels strategically to filter log messages and only record the information that is relevant for debugging and monitoring.
+*   **Dependency Injection:** Integrate the `ILogger` through dependency injection in your application for better testability, configurability and loose coupling.

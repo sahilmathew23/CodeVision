@@ -1,126 +1,147 @@
 using System;
 using System.IO;
-using Microsoft.Extensions.Logging;
 
 namespace LoggingService
 {
-    public interface IAppLogger
+    public interface ILogger
     {
-        void LogInformation(string message);
+        void LogMessage(string message);
+        void LogError(string message, Exception ex = null);
         void LogWarning(string message);
-        LogError(string message, Exception ex = null);
+        void LogInformation(string message);
     }
 
-    public class AppLogger : IAppLogger
+    public class FileLogger : ILogger, IDisposable
     {
-        private readonly ILogger _logger;
         private readonly string _logFilePath;
+        private StreamWriter _writer;
+        private bool _disposed = false;
 
-        public AppLogger(ILogger<AppLogger> logger, string logFilePath = "app.log") // Inject ILogger and allow configurable log file path
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath)); ; // Default log file path
-            EnsureLogFileExists();
-        }
 
-        private void EnsureLogFileExists()
+        public FileLogger(string logFilePath = "log.txt")
         {
+            _logFilePath = logFilePath;
             try
             {
-                if (!File.Exists(_logFilePath))
-                {
-                    // Create the file if it doesn't exist
-                    using (File.Create(_logFilePath)) { } // Create and immediately dispose to release the handle.
-                }
+                // Append to the log file if it exists. Create if it doesn't.
+                _writer = new StreamWriter(_logFilePath, true);
+                _writer.AutoFlush = true; // Ensures data is written immediately.
+                LogInformation("Logger initialized."); // Log initialization
             }
             catch (Exception ex)
             {
-                //If the log file can't be created, log it to the Console
-                Console.WriteLine($"Error creating log file: {ex.Message}");
-                Console.Error.WriteLine($"Error creating log file: {ex.Message}");
+                // Handle the exception, potentially logging to a fallback logger or re-throwing
+                Console.Error.WriteLine($"Error initializing FileLogger: {ex.Message}");
+                throw; // Re-throw to indicate initialization failure
             }
         }
 
+        public void LogMessage(string message)
+        {
+            LogInformation(message); // Default to information level
+        }
 
         public void LogInformation(string message)
         {
-            Log(LogLevel.Information, message);
+            Log($"INFO: {message}");
         }
 
         public void LogWarning(string message)
         {
-            Log(LogLevel.Warning, message);
+            Log($"WARN: {message}");
         }
 
         public void LogError(string message, Exception ex = null)
         {
-            Log(LogLevel.Error, message, ex);
+            if (ex == null)
+            {
+                Log($"ERROR: {message}");
+            }
+            else
+            {
+                Log($"ERROR: {message} Exception: {ex}");
+            }
         }
 
-        private void Log(LogLevel logLevel, string message, Exception ex = null)
+        private void Log(string message)
         {
+            if (_disposed) return; // Prevent logging after disposal
+
             try
             {
-                string logEntry = $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [{logLevel}] {message}";
-
-                if (ex != null)
+                //Thread safety (simple locking)
+                lock (_writer)
                 {
-                    logEntry += $"\nException: {ex.Message}\nStack Trace: {ex.StackTrace}";
+                    _writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}");
                 }
+            }
+            catch (ObjectDisposedException)
+            {
+                Console.Error.WriteLine("Logger has been disposed.  Cannot write to log.");
+            }
+            catch (Exception ex)
+            {
+                //Handle logging failure gracefully
+                Console.Error.WriteLine($"Error writing to log file: {ex.Message}");
+            }
+        }
 
-                _logger.Log(logLevel, logEntry); //Use the injected logger
 
-                //Append to file.  Uses a try/catch to prevent crashes if the log file can't be written to for any reason
-                try
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
                 {
-                    using (var writer = File.AppendText(_logFilePath))
+                    // Dispose managed resources.
+                    if (_writer != null)
                     {
-                        writer.WriteLine(logEntry);
+                        _writer.Flush(); // Flush before closing
+                        _writer.Close();
+                        _writer.Dispose();
+                        _writer = null;
                     }
                 }
-                catch (Exception fileEx)
-                {
-                    _logger.LogError($"Error writing to log file: {fileEx.Message}");
-                    // Fallback: If writing to the log file fails, write to console.
-                    Console.WriteLine($"Error writing to log file, falling back to console: {fileEx.Message}");
-                    Console.Error.WriteLine(logEntry);
-                }
-            }
-            catch (Exception overallEx)
-            {
-                //In the very rare event that logging fails completely, log it to the console
-                Console.WriteLine($"FATAL: Logging failed: {overallEx.Message}");
-                Console.Error.WriteLine($"FATAL: Logging failed: {overallEx.Message}");
-            }
 
+                // Dispose unmanaged resources, if any.
+
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        ~FileLogger()
+        {
+            // Finalizer to ensure resources are released even if Dispose isn't called.
+            Dispose(disposing: false);
         }
     }
 }
 
 
-    builder.Services.AddSingleton<IAppLogger, AppLogger>();
-    builder.Services.AddLogging(configure => configure.AddConsole()); // Adds console logger
-    builder.Services.AddSingleton<ILogger<AppLogger>>(provider => provider.GetRequiredService<ILoggerFactory>().CreateLogger<AppLogger>());
-    
-
-    public class MyService
+// Example Usage (Dependency Injection is recommended)
+using (ILogger logger = new FileLogger("my_app.log"))
+{
+    try
     {
-        private readonly IAppLogger _logger;
-
-        public MyService(IAppLogger logger)
-        {
-            _logger = logger;
-        }
-
-        public void DoSomething()
-        {
-            try
-            {
-                // ... some code that might throw an exception ...
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("An error occurred while doing something.", ex);
-            }
-        }
+        // Some code that might throw an exception
+        int result = 10 / 0; // This will throw a DivideByZeroException
     }
+    catch (Exception ex)
+    {
+        logger.LogError("An error occurred during calculation.", ex);
+    }
+
+    logger.LogInformation("Application started.");
+    logger.LogWarning("Low disk space detected.");
+    logger.LogMessage("This is just a message.");  //Defaults to INFO level
+}
+
+//Outside the using block, the logger is automatically disposed of.

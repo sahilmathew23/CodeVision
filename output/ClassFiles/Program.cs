@@ -3,139 +3,123 @@ using Microsoft.Extensions.DependencyInjection;
 using InputProcessor;
 using UserManagement;
 using LoggingService;
-using System.Threading.Tasks;
 
-namespace MyApplication
+// Define an interface for the application's core functionality
+public interface IApplication
 {
-    public class Program
+    void Run();
+}
+
+// Implement the application logic using dependency injection
+public class Application : IApplication
+{
+    private readonly IDataHandler _dataHandler;
+    private readonly IUserManager _userManager;
+    private readonly ILogger _logger;
+
+    public Application(IDataHandler dataHandler, IUserManager userManager, ILogger logger)
     {
-        private static async Task Main(string[] args)
+        _dataHandler = dataHandler ?? throw new ArgumentNullException(nameof(dataHandler));
+        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public void Run()
+    {
+        _logger.LogMessage("Starting Application...");
+
+        try
         {
-            Console.WriteLine("Starting Application...");
+            var processedData = _dataHandler.ProcessData();
+            var user = _userManager.ManageUsers();
 
-            // Configure Dependency Injection
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IDataHandler, DataHandler>()
-                .AddSingleton<IUserManager, UserManager>()
-                .AddSingleton<ILogger, Logger>()
-                .BuildServiceProvider();
-
-            // Resolve dependencies
-            var dataHandler = serviceProvider.GetService<IDataHandler>();
-            var userManager = serviceProvider.GetService<IUserManager>();
-            var logger = serviceProvider.GetService<ILogger>();
-
-            try
-            {
-                // Process data asynchronously
-                var processedData = await Task.Run(() => dataHandler.ProcessData());
-
-                // Manage users asynchronously
-                var user = await Task.Run(() => userManager.ManageUsers());
-
-                // Log the results
-                logger.LogMessage($"Processed Data: {processedData}, User: {user}");
-            }
-            catch (Exception ex)
-            {
-                // Centralized error handling
-                logger.LogError($"An error occurred: {ex.Message}, StackTrace: {ex.StackTrace}");
-                Console.Error.WriteLine($"Application encountered an error.  Check logs for details."); //Inform the user
-                // Potentially handle the exception in a more sophisticated way, such as retrying or shutting down gracefully.
-            }
-            finally
-            {
-                Console.WriteLine("Application finished.");
-            }
-
-            // Optionally, dispose of the service provider if needed
-            if (serviceProvider is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+            _logger.LogMessage($"Processed Data: {processedData}, User: {user}");
         }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An error occurred: {ex.Message}", ex); //Enhanced error logging
+        }
+
+        _logger.LogMessage("Application finished.");
     }
 }
 
 
-    namespace InputProcessor
+class Program
+{
+    static void Main()
     {
-        public interface IDataHandler
-        {
-            string ProcessData();
-        }
+        // Setup Dependency Injection
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton<IDataHandler, DataHandler>()
+            .AddSingleton<IUserManager, UserManager>()
+            .AddSingleton<ILogger, Logger>()
+            .AddSingleton<IApplication, Application>() // Register the Application class
+            .BuildServiceProvider();
+
+
+        // Resolve the Application from the DI container
+        var application = serviceProvider.GetService<IApplication>();
+
+        // Run the application
+        application.Run();
     }
-    
+}
 
-    namespace UserManagement
-    {
-        public interface IUserManager
-        {
-            string ManageUsers();
-        }
-    }
-    
 
-    namespace LoggingService
-    {
-        public interface ILogger
-        {
-            void LogMessage(string message);
-            void LogError(string message);
-        }
-    }
-    
-
-// InputProcessor/DataHandler.cs
-using System;
-
+// InputProcessor project
 namespace InputProcessor
 {
+    public interface IDataHandler
+    {
+        string ProcessData();
+    }
+
     public class DataHandler : IDataHandler
     {
         public string ProcessData()
         {
-            // Simulate data processing (replace with your actual logic)
-            Console.WriteLine("Processing data...");
-            System.Threading.Thread.Sleep(1000); // Simulate work
-            return "Processed Data Result";
+            return "Processed Data from DataHandler";
         }
     }
 }
 
-// UserManagement/UserManager.cs
-using System;
-
+// UserManagement project
 namespace UserManagement
 {
+    public interface IUserManager
+    {
+        string ManageUsers();
+    }
+
     public class UserManager : IUserManager
     {
         public string ManageUsers()
         {
-            // Simulate user management (replace with your actual logic)
-            Console.WriteLine("Managing users...");
-            System.Threading.Thread.Sleep(500); // Simulate work
-            return "User Management Result";
+            return "User information from UserManager";
         }
     }
 }
 
-// LoggingService/Logger.cs
-using System;
-
+// LoggingService project
 namespace LoggingService
 {
+    public interface ILogger
+    {
+        void LogMessage(string message);
+        void LogError(string message, Exception ex);
+    }
+
     public class Logger : ILogger
     {
         public void LogMessage(string message)
         {
-            Console.WriteLine($"[INFO] {DateTime.Now}: {message}");
-            // Optionally, write to a file, database, or other logging system
+            Console.WriteLine($"Log: {message}");
         }
-        public void LogError(string message)
+
+        public void LogError(string message, Exception ex)
         {
-            Console.Error.WriteLine($"[ERROR] {DateTime.Now}: {message}");
-            //Potentially log to a file, database, or logging service (like Serilog, NLog, etc.)
+            Console.Error.WriteLine($"Error: {message}\n{ex}");
         }
     }
 }

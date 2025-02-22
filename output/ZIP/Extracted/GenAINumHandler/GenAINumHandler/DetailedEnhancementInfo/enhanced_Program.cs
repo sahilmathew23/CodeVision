@@ -4,195 +4,173 @@ using Microsoft.Extensions.DependencyInjection;
 using InputProcessor;
 using UserManagement;
 using LoggingService;
-using System.Threading.Tasks;
 
-namespace MyApplication
+// Define an interface for the application's core functionality
+public interface IApplication
 {
-    public class Program
+    void Run();
+}
+
+// Implement the application logic using dependency injection
+public class Application : IApplication
+{
+    private readonly IDataHandler _dataHandler;
+    private readonly IUserManager _userManager;
+    private readonly ILogger _logger;
+
+    public Application(IDataHandler dataHandler, IUserManager userManager, ILogger logger)
     {
-        private static async Task Main(string[] args)
+        _dataHandler = dataHandler ?? throw new ArgumentNullException(nameof(dataHandler));
+        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public void Run()
+    {
+        _logger.LogMessage("Starting Application...");
+
+        try
         {
-            Console.WriteLine("Starting Application...");
+            var processedData = _dataHandler.ProcessData();
+            var user = _userManager.ManageUsers();
 
-            // Configure Dependency Injection
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IDataHandler, DataHandler>()
-                .AddSingleton<IUserManager, UserManager>()
-                .AddSingleton<ILogger, Logger>()
-                .BuildServiceProvider();
-
-            // Resolve dependencies
-            var dataHandler = serviceProvider.GetService<IDataHandler>();
-            var userManager = serviceProvider.GetService<IUserManager>();
-            var logger = serviceProvider.GetService<ILogger>();
-
-            try
-            {
-                // Process data asynchronously
-                var processedData = await Task.Run(() => dataHandler.ProcessData());
-
-                // Manage users asynchronously
-                var user = await Task.Run(() => userManager.ManageUsers());
-
-                // Log the results
-                logger.LogMessage($"Processed Data: {processedData}, User: {user}");
-            }
-            catch (Exception ex)
-            {
-                // Centralized error handling
-                logger.LogError($"An error occurred: {ex.Message}, StackTrace: {ex.StackTrace}");
-                Console.Error.WriteLine($"Application encountered an error.  Check logs for details."); //Inform the user
-                // Potentially handle the exception in a more sophisticated way, such as retrying or shutting down gracefully.
-            }
-            finally
-            {
-                Console.WriteLine("Application finished.");
-            }
-
-            // Optionally, dispose of the service provider if needed
-            if (serviceProvider is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+            _logger.LogMessage($"Processed Data: {processedData}, User: {user}");
         }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An error occurred: {ex.Message}", ex); //Enhanced error logging
+        }
+
+        _logger.LogMessage("Application finished.");
+    }
+}
+
+
+class Program
+{
+    static void Main()
+    {
+        // Setup Dependency Injection
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton<IDataHandler, DataHandler>()
+            .AddSingleton<IUserManager, UserManager>()
+            .AddSingleton<ILogger, Logger>()
+            .AddSingleton<IApplication, Application>() // Register the Application class
+            .BuildServiceProvider();
+
+
+        // Resolve the Application from the DI container
+        var application = serviceProvider.GetService<IApplication>();
+
+        // Run the application
+        application.Run();
     }
 }
 ```
 
-**Explanation of Modifications and How SOLID Principles are Applied:**
+**Explanation of Modifications:**
 
-1.  **Namespace:**  Enclosed the `Program` class within a namespace `MyApplication` for better organization and to avoid potential naming conflicts.
+1. **SOLID Principles & Dependency Injection (DI):**
+   - **Interface Segregation & Dependency Inversion:** Introduced `IApplication`, `IDataHandler`, `IUserManager`, and `ILogger` interfaces. This decouples the concrete implementations from the `Application` class and `Program.cs`. The `Application` class now depends on abstractions (interfaces) instead of concrete classes.  This allows for easier testing and swapping of implementations.
+   - **Dependency Injection Container:**  The `Microsoft.Extensions.DependencyInjection` library is used to set up a simple DI container.  This container registers the interfaces and their concrete implementations.
+   - **Constructor Injection:** The `Application` class now receives its dependencies (`IDataHandler`, `IUserManager`, `ILogger`) through its constructor. This is a key principle of DI.  The `Program` class resolves these dependencies through the DI container.
 
-2.  **Dependency Injection (DI):**
-    *   Introduced Microsoft's `DependencyInjection` package for managing dependencies. This promotes loose coupling and testability (Dependency Inversion Principle - DIP).
-    *   Configured a `ServiceCollection` to register `DataHandler`, `UserManager`, and `Logger` as singletons.  Using singletons *can* have drawbacks in very large multithreaded applications (potential contention issues if not designed correctly), but here it keeps the example concise. Transient or Scoped lifetimes could be alternatives, depending on the desired behavior and lifecycle.  We also register *interfaces* (see next point) with their concrete implementations.
-    *   Resolved the dependencies using `serviceProvider.GetService<T>()`. This avoids direct instantiation and allows for easier swapping of implementations later.
+2. **Modularity and Reusability:**
+   - By using interfaces and DI, the `Application` class becomes highly modular.  Different implementations of `IDataHandler`, `IUserManager`, and `ILogger` can be easily swapped in and out without modifying the `Application` class itself.  This promotes reusability of components.
 
-3. **Interface Abstractions (Interface Segregation Principle - ISP, and Dependency Inversion Principle - DIP):**
+3. **Performance and Scalability:**
+    - While this example doesn't directly address large-scale performance concerns (like database connections or network operations), the use of DI makes it easier to inject optimized implementations of the dependencies. For example, a more efficient logging implementation could be injected without changing the rest of the code.
+    - Singleton lifetime for services is chosen for simplicity in this example.  In more complex applications, consider other lifetimes (Scoped, Transient) depending on the needs of the specific services.
 
-   *   **`IDataHandler` interface:**
-    ```csharp
-    namespace InputProcessor
-    {
-        public interface IDataHandler
-        {
-            string ProcessData();
-        }
-    }
+4. **Error Handling and Logging:**
+   - **Try-Catch Block:** A `try-catch` block is added within the `Application.Run()` method to catch potential exceptions during data processing or user management.
+   - **Enhanced Logging:** The `LogError` method is used in the `catch` block to log detailed error information, including the exception message and stack trace.  This makes debugging much easier. The logger now uses interpolation.
+   - The `ArgumentNullException` checks in the `Application` constructor provide fail-fast behavior and help to avoid null reference exceptions later.
+
+5. **Security Best Practices:**
+   - This specific code example doesn't directly involve sensitive data handling or authentication/authorization. However, the use of interfaces and DI is crucial for enabling security practices.  For example, a secure logging implementation could be injected that masks sensitive data before logging it.
+   - When dealing with data access, ensure proper input validation, parameterized queries (to prevent SQL injection), and proper access control mechanisms are implemented in the `DataHandler` and `UserManager` classes.
+
+6. **.NET Coding Conventions:**
+   - PascalCase is used for class names, method names, and properties.
+   - camelCase is used for local variables and method parameters.
+   - Using directives are organized at the top of the file.
+   - Consistent indentation is used.
+   - Meaningful names are used for variables and methods.
+
+7. **Redundant object creation:**
+    - Removed redundant object creation of `DataHandler`
+
+**How to run:**
+
+1.  **Create a new .NET console application**.
+2.  **Install the `Microsoft.Extensions.DependencyInjection` NuGet package:**
+    ```bash
+    dotnet add package Microsoft.Extensions.DependencyInjection
     ```
-    *   **`IUserManager` interface:**
-    ```csharp
-    namespace UserManagement
-    {
-        public interface IUserManager
-        {
-            string ManageUsers();
-        }
-    }
-    ```
-
-    *   **`ILogger` interface:**
-    ```csharp
-    namespace LoggingService
-    {
-        public interface ILogger
-        {
-            void LogMessage(string message);
-            void LogError(string message);
-        }
-    }
-    ```
-
-    *   The `DataHandler`, `UserManager`, and `Logger` classes should now implement these interfaces. This dramatically improves testability and allows for different implementations of each functionality to be easily swapped in. The `Program` class depends on abstractions (`IDataHandler`, `IUserManager`, `ILogger`) instead of concrete implementations. This adheres to the DIP. Furthermore, ISP is followed as each interface only contains the methods that specific class/module requires.
-
-4.  **Asynchronous Operations (Improved Performance and Scalability):**
-    *   Used `async Task Main` to enable asynchronous operations.
-    *   Wrapped `dataHandler.ProcessData()` and `userManager.ManageUsers()` in `Task.Run()` to execute them on a separate thread pool thread.  This prevents the main thread from blocking, especially if these operations are time-consuming (improved responsiveness and scalability).
-    *   Awaited the results of the asynchronous operations.
-
-5.  **Centralized Error Handling:**
-    *   Introduced a `try-catch` block to handle potential exceptions during data processing, user management, or logging.
-    *   Logged the exception details, including the message and stack trace, using `logger.LogError()`.  This is crucial for debugging and identifying issues.
-    *   Provided a basic error message to the console for user feedback.
-
-6.  **Redundancy Removal:**
-    *   Removed the redundant `dataHandler = new DataHandler(); dataHandler.ProcessData();` code block.  The original code was creating a new instance of `DataHandler` but never using its result, which was a waste of resources. The dependency injection setup ensures a single instance is used throughout.
-
-7.  **Explicit Resource Disposal:**
-    *   Included a `finally` block to ensure that resources are properly disposed of, especially the `ServiceProvider`, if it implements `IDisposable`. While garbage collection will eventually clean up, explicitly disposing of resources is best practice, especially when dealing with external connections (e.g., databases) within the injected classes.
-
-8.  **Logging Enhancement:**
-    * Added `LogError` to the ILogger interface and Logger class.  The catch block now logs errors using this new method.  This separation improves clarity and allows for different logging mechanisms for errors vs. informational messages.
-
-9. **Adherence to .NET Coding Conventions:**
-    * Consistent use of PascalCase for class and method names.
-    * Clear and concise code formatting.
-    * Use of meaningful variable names.
-
-**Example Implementations of supporting classes (DataHandler, UserManager, Logger):**
+3.  **Create the `InputProcessor`, `UserManagement` and `LoggingService` projects/classes** with the corresponding interfaces.  For example:
 
 ```csharp
-// InputProcessor/DataHandler.cs
-using System;
-
+// InputProcessor project
 namespace InputProcessor
 {
+    public interface IDataHandler
+    {
+        string ProcessData();
+    }
+
     public class DataHandler : IDataHandler
     {
         public string ProcessData()
         {
-            // Simulate data processing (replace with your actual logic)
-            Console.WriteLine("Processing data...");
-            System.Threading.Thread.Sleep(1000); // Simulate work
-            return "Processed Data Result";
+            return "Processed Data from DataHandler";
         }
     }
 }
 
-// UserManagement/UserManager.cs
-using System;
-
+// UserManagement project
 namespace UserManagement
 {
+    public interface IUserManager
+    {
+        string ManageUsers();
+    }
+
     public class UserManager : IUserManager
     {
         public string ManageUsers()
         {
-            // Simulate user management (replace with your actual logic)
-            Console.WriteLine("Managing users...");
-            System.Threading.Thread.Sleep(500); // Simulate work
-            return "User Management Result";
+            return "User information from UserManager";
         }
     }
 }
 
-// LoggingService/Logger.cs
-using System;
-
+// LoggingService project
 namespace LoggingService
 {
+    public interface ILogger
+    {
+        void LogMessage(string message);
+        void LogError(string message, Exception ex);
+    }
+
     public class Logger : ILogger
     {
         public void LogMessage(string message)
         {
-            Console.WriteLine($"[INFO] {DateTime.Now}: {message}");
-            // Optionally, write to a file, database, or other logging system
+            Console.WriteLine($"Log: {message}");
         }
-        public void LogError(string message)
+
+        public void LogError(string message, Exception ex)
         {
-            Console.Error.WriteLine($"[ERROR] {DateTime.Now}: {message}");
-            //Potentially log to a file, database, or logging service (like Serilog, NLog, etc.)
+            Console.Error.WriteLine($"Error: {message}\n{ex}");
         }
     }
 }
 ```
 
-**To Run the Code:**
+4. **Replace the content of your `Program.cs` with the enhanced version provided.**
+5.  **Add project references:** In your main project, add project references to `InputProcessor`, `UserManagement`, and `LoggingService`.
+6. **Build and Run**.
 
-1.  Create a new .NET console application project.
-2.  Install the `Microsoft.Extensions.DependencyInjection` NuGet package.
-3.  Create the `InputProcessor`, `UserManagement`, and `LoggingService` folders and place the corresponding files within them (including the interface definitions).  Make sure the namespace in each file matches the folder structure (e.g., `namespace InputProcessor { ... }`).
-4.  Replace the content of `Program.cs` with the enhanced version provided.
-5.  Run the application.
-
-This enhanced version of `Program.cs` incorporates SOLID principles, improves modularity and reusability, addresses performance concerns, adds robust error handling, and adheres to .NET coding conventions.  It's a much more maintainable and scalable foundation for a larger application.  Remember to replace the placeholder logic in `DataHandler`, `UserManager`, and `Logger` with your actual implementations. Also, consider using a more sophisticated logging framework like Serilog or NLog for production environments.
+This improved structure enhances maintainability, testability, and scalability of the application by adhering to SOLID principles and leveraging dependency injection.

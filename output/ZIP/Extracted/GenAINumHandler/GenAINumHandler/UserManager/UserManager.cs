@@ -2,109 +2,152 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace UserManagement
 {
-    // Interface for user repository, adhering to Dependency Inversion Principle (DIP)
     public interface IUserRepository
     {
-        IEnumerable<string> GetUsers();
+        IEnumerable<string> GetUsernames();
     }
 
-    // Concrete implementation of UserRepository
     public class UserRepository : IUserRepository
     {
-        public IEnumerable<string> GetUsers()
+        // Ideally, this would connect to a database.  For this example, using an in-memory list.
+        private readonly List<string> _users = new List<string> { "Alice", "Bob" };
+
+        public IEnumerable<string> GetUsernames()
         {
-            //Simulating data source access.  In a real scenario, this would access a database or other storage.
-            return new List<string> { "Alice", "Bob" };
+            // Defensive copy to prevent external modification of the internal list.
+            return _users.ToList();
         }
     }
 
 
-    public class UserManager
-    {
+	public class UserManager
+	{
+		private readonly ILogger<UserManager> _logger;
         private readonly IUserRepository _userRepository;
-        private readonly ILogger<UserManager> _logger;
 
-        // Constructor injection for dependencies (DIP)
-        public UserManager(IUserRepository userRepository, ILogger<UserManager> logger)
-        {
+        public UserManager(ILogger<UserManager> logger, IUserRepository userRepository)
+		{
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+		}
 
-        // Method to retrieve and process user list.  Error handling and logging implemented.
-        public string ManageUsers()
+		public string ManageUsers(int userIndex)
+		{
+			try
+			{
+                var users = _userRepository.GetUsernames().ToArray();  // Get users from the repository
+                if (userIndex >= 0 && userIndex < users.Length)
+				{
+					return users[userIndex];
+				}
+				else
+				{
+					_logger.LogError("Invalid user index: {userIndex}", userIndex);
+					throw new ArgumentOutOfRangeException(nameof(userIndex), "User index is out of range.");
+				}
+			}
+			catch (ArgumentOutOfRangeException ex)
+			{
+				_logger.LogError(ex, "Error managing users.");
+				return "Error: Invalid User Index"; // Handle exception gracefully. Consider a custom exception type
+			}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while managing users.");
+                return "Error: An unexpected error occurred.";
+            }
+		}
+
+        public string CreateUser(string username, string password)
         {
             try
             {
-                var users = _userRepository.GetUsers().ToList(); // Get users from repository
-
-                if (users == null || !users.Any())
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 {
-                    _logger.LogWarning("No users found.");
-                    return "No users found.";
+                    _logger.LogError("Username or password cannot be null or whitespace.");
+                    throw new ArgumentException("Username and password must be provided.");
                 }
 
+                // Generate salt
+                byte[] salt;
+                new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
 
-                // Example operation: Return the first user's name in uppercase.
-                // This operation can be easily modified or extended without affecting other parts of the class.
-                string firstUser = users.FirstOrDefault();
-                if (string.IsNullOrEmpty(firstUser))
-                {
-                    _logger.LogWarning("User list is empty.");
-                    return "User list is empty";
-                }
+                // Hash password with salt
+                var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000);
+                byte[] hash = pbkdf2.GetBytes(20);
 
-                string result = firstUser.ToUpperInvariant();
-                _logger.LogInformation("Successfully processed user: {User}", firstUser);
-                return result;
+                // Combine salt and hash for storage (e.g., in a database)
+                byte[] hashBytes = new byte[36];
+                Array.Copy(salt, 0, hashBytes, 0, 16);
+                Array.Copy(hash, 0, hashBytes, 16, 20);
 
+                string savedPasswordHash = Convert.ToBase64String(hashBytes);
 
+                // In a real application, you would save the username and savedPasswordHash to a database.
+                // This is a simplified example, so we're just logging the result.
+                _logger.LogInformation("User created: {Username}", username);
+                _logger.LogDebug("Password hash: {PasswordHash}", savedPasswordHash);
+
+                return "User created successfully";
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Error creating user.");
+                return "Error: Invalid username or password";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while managing users."); // Log the exception with details
-                return "An error occurred while managing users."; // Return a user-friendly message.  Consider using a custom exception type for better handling upstream.
+                _logger.LogError(ex, "An unexpected error occurred while creating a user.");
+                return "Error: An unexpected error occurred during user creation.";
             }
         }
     }
 }
 
 
-using Microsoft.Extensions.DependencyInjection;
+// Example Usage (Program.cs or similar)
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using UserManagement;
 
-public class Startup
+public class Program
 {
-    public void ConfigureServices(IServiceCollection services)
+    public static void Main(string[] args)
     {
-        services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<UserManager>(); //No need to register logger - provided by framework
-        // ... other services
-    }
-}
+        // Setup dependency injection for logging.
+        var serviceProvider = new ServiceCollection()
+            .AddLogging(builder => builder.AddConsole())
+            .AddSingleton<IUserRepository, UserRepository>()
+            .AddTransient<UserManager>()
+            .BuildServiceProvider();
+
+        var logger = serviceProvider.GetService<ILogger<Program>>();
+        var userManager = serviceProvider.GetService<UserManager>();
 
 
 
-using Microsoft.AspNetCore.Mvc;
-using UserManagement;
+        try
+        {
+            string user = userManager.ManageUsers(0);
+            Console.WriteLine($"User at index 0: {user}");
 
-public class UserController : ControllerBase
-{
-    private readonly UserManager _userManager;
+            string user2 = userManager.ManageUsers(1);
+            Console.WriteLine($"User at index 1: {user2}");
 
-    public UserController(UserManager userManager)
-    {
-        _userManager = userManager;
-    }
+            string user3 = userManager.ManageUsers(5); // Intentional out-of-range access
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred in Main.");
+            Console.WriteLine("An error occurred. Check the logs.");
+        }
 
-    [HttpGet("/users")]
-    public IActionResult GetUsers()
-    {
-        string result = _userManager.ManageUsers();
-        return Ok(result);
+         string creationResult = userManager.CreateUser("testuser", "P@$$wOrd");
+         Console.WriteLine(creationResult);
     }
 }
