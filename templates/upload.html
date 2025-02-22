@@ -3,35 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload your Project for CodeVision</title>
+    <title>Upload Your Project - CodeVision</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .upload-container {
             max-width: 400px;
-            margin: 0 auto;
+            width: 100%;
             padding: 20px;
-            border: 1px solid #ccc;
             border-radius: 8px;
-            background-color: #f9f9f9;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        input[type="file"], select {
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        select, input[type="file"] {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .file-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
         }
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background 0.3s;
         }
         button:hover {
             background-color: #45a049;
@@ -48,11 +72,21 @@
             <option value="gpt-4-turbo">GPT-4 Turbo</option>
             <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
         </select>
-        <input type="file" name="file" accept=".zip" required>
+
+        <label for="file">Upload ZIP File:</label>
+        <input type="file" name="file" id="file" accept=".zip" required>
+        <span class="file-label">No file chosen</span>
+
         <button type="submit">Upload File</button>
     </form>
-    
 </div>
+
+<script>
+    document.getElementById("file").addEventListener("change", function() {
+        let fileLabel = document.querySelector(".file-label");
+        fileLabel.textContent = this.files.length > 0 ? this.files[0].name : "No file chosen";
+    });
+</script>
 
 </body>
 </html>
