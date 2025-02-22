@@ -1,0 +1,87 @@
+===== DataHandler.cs (/tmp/tmp16c00i1v/GenAINumHandler/InputProcessor/DataHandler.cs) =====
+﻿using System;
+
+namespace InputProcessor
+{
+	public class DataHandler
+	{
+		private int num1 = 10;
+		private int num2 = 20;
+		private int[] dataArray = new int[ 1000000 ]; // Unused memory allocation
+
+		public int ProcessData()
+		{
+			Console.WriteLine( "Processing Data..." );
+			for ( int i = 0; i < 100000; i++ ) // Unnecessary large loop
+			{
+				Console.WriteLine( "Iteration: " + i );
+			}
+			int result = num1 + num2;
+			Console.WriteLine( "Calculated Result: " + result );
+			return result;
+		}
+	}
+}
+
+================================================================================
+
+===== Logger.cs (/tmp/tmp16c00i1v/GenAINumHandler/LoggingService/Logger.cs) =====
+﻿namespace LoggingService
+{
+	public class Logger
+	{
+		public void LogMessage( string message )
+		{
+			System.IO.StreamWriter writer = new System.IO.StreamWriter( "log.txt" ); // No using statement, potential memory leak
+			writer.WriteLine( "Logging started..." );
+			writer.WriteLine( message );
+			writer.Close();
+		}
+	}
+}
+
+================================================================================
+
+===== UserManager.cs (/tmp/tmp16c00i1v/GenAINumHandler/UserManager/UserManager.cs) =====
+﻿namespace UserManagement
+{
+	public class UserManager
+	{
+		public string ManageUsers()
+		{
+			string[] users = { "Alice", "Bob" };
+			return users[ 5 ]; // Index out of bounds, no error handling
+		}
+	}
+}
+
+================================================================================
+
+===== Program.cs (/tmp/tmp16c00i1v/GenAINumHandler/DataProcessorMain/Program.cs) =====
+﻿using System;
+using InputProcessor;
+using UserManagement;
+using LoggingService;
+class Program
+{
+	static void Main()
+	{
+		Console.WriteLine( "Starting Application..." );
+
+		DataHandler dataHandler = new DataHandler();
+		var processedData = dataHandler.ProcessData();
+
+		UserManager userManager = new UserManager();
+		var user = userManager.ManageUsers();
+
+		Logger logger = new Logger();
+		logger.LogMessage( "Processed Data: " + processedData + " User: " + user );
+
+		// Redundant object creation
+		dataHandler = new DataHandler();
+		dataHandler.ProcessData();
+	}
+}
+
+================================================================================
+

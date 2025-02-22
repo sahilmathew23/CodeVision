@@ -58,7 +58,7 @@ def main():
     
     #Removes temp files & folders
     print("Starting cleanUp.py...\n")
-    run_script("cleanUP.py")
+    #run_script("cleanUP.py")
     print()
     print()
     

@@ -68,6 +68,23 @@ def enhance_file():
 def download_file(filename):
     return send_from_directory(EXTRACTED_FOLDER, filename, as_attachment=True)
 
+@app.route('/get-info', methods=['POST'])
+def get_info():
+    data = request.get_json()
+    query = data.get('query', '')
+
+    if not query:
+        return jsonify({"message": "No query provided"}), 400
+
+    try:
+        result = subprocess.run(["python", "projectQuery.py", query], capture_output=True, text=True, check=True)
+        response_message = result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        response_message = f"Error processing query: {e}"
+
+    return jsonify({"message": response_message})
+
+
 @app.route('/enhance-process', methods=['POST'])
 def enhance_process():
     filename = request.form['filename']
@@ -91,4 +108,4 @@ def enhance_process():
         return jsonify({"message": f"Error in running pipeline: {e}"}), 500
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5001,debug=True)
