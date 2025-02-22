@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import re
+from google import genai
 import tiktoken  # OpenAI's tokenization library
 
 def call_openai_api(prompt):
@@ -34,6 +35,28 @@ def call_openai_api(prompt):
         print(f"Error calling OpenAI API: {e}")
         return None
 
+def call_gemini_api(prompt):
+    """Call the Gemini API with the provided prompt and return the response."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("Error: Gemini API key is not set.")
+        return None
+    
+    encoder = tiktoken.get_encoding("cl100k_base")
+    prompt_tokens = len(encoder.encode(prompt))
+    print(f"Number of tokens in the prompt: {prompt_tokens}")
+    print()
+    
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=prompt
+        )
+        return response.text if response else None
+    except Exception as e:
+        print(f"Error calling Gemini API: {e}")
+        return None
+    
 def extract_files_from_merged_output(file_path):
     """Extract individual file content from merged_output.txt."""
     with open(file_path, "r", encoding="utf-8") as file:
@@ -72,8 +95,8 @@ def enhance():
     os.makedirs(output_dir, exist_ok=True) 
     for file_name, file_content in extracted_files.items():
         prompt = prompt_template.format(file_name=file_name, file_content_str=file_content)
-        output = call_openai_api(prompt)
-        
+        #output = call_openai_api(prompt)
+        output = call_gemini_api(prompt)
         if output:
             output_file = f"output/enhancedClassFiles/enhanced_{file_name}"
             with open(output_file, "w", encoding="utf-8") as f:
