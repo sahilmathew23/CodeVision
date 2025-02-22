@@ -51,31 +51,44 @@ def upload_file():
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
 
-            # Automatically run run_pipeline.py with the uploaded file name and selected model
-            try:
-                subprocess.run(["python", "run_pipeline.py", file.filename, model], check=True)
-
-                # Define the path to the extracted zip file
-                extracted_file_path = '/workspaces/CodeVision1/output/ZIP'
-
-                # Check if the extracted zip file exists
-                if os.path.exists(os.path.join(extracted_file_path, "Extracted_files.zip")):
-                    print(f"Extracted file ZIP path: {extracted_file_path}/Extracted_files.zip")
-
-                    # Directly download the extracted file
-                    return send_from_directory(extracted_file_path, 'Extracted_files.zip', as_attachment=True)
-                else:
-                    return jsonify({"message": "Error: Extracted zip file not found after processing."}), 500
-            except subprocess.CalledProcessError as e:
-                return jsonify({"message": f"Error in running pipeline: {e}"}), 500
+            # Redirect to enhance page with the filename and model
+            return redirect(url_for('enhance_file', filename=file.filename, model=model))
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
     return render_template('upload.html')
+
+@app.route('/enhance')
+def enhance_file():
+    filename = request.args.get('filename')
+    model = request.args.get('model')
+    return render_template('enhance.html', filename=filename, model=model)
 
 # Route to serve the extracted .zip file
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(EXTRACTED_FOLDER, filename, as_attachment=True)
 
+@app.route('/enhance-process', methods=['POST'])
+def enhance_process():
+    filename = request.form['filename']
+    model = request.form['model']
+
+    try:
+        subprocess.run(["python", "run_pipeline.py", filename, model], check=True)
+
+        # Define the path to the extracted zip file
+        extracted_file_path = '/workspaces/CodeVision1/output/ZIP'
+
+        # Check if the extracted zip file exists
+        if os.path.exists(os.path.join(extracted_file_path, "Extracted_files.zip")):
+            print(f"Extracted file ZIP path: {extracted_file_path}/Extracted_files.zip")
+
+            # Directly download the extracted file
+            return send_from_directory(extracted_file_path, 'Extracted_files.zip', as_attachment=True)
+        else:
+            return jsonify({"message": "Error: Extracted zip file not found after processing."}), 500
+    except subprocess.CalledProcessError as e:
+        return jsonify({"message": f"Error in running pipeline: {e}"}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
