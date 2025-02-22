@@ -1,6 +1,0 @@
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\bin\Debug\InputProcessor.dll
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\bin\Debug\InputProcessor.pdb
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\obj\Debug\InputProcessor.csproj.AssemblyReference.cache
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\obj\Debug\InputProcessor.csproj.CoreCompileInputs.cache
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\obj\Debug\InputProcessor.dll
-C:\Users\sahil\source\repos\GenAINumHandler\InputProcessor\obj\Debug\InputProcessor.pdb

@@ -1,7 +1,0 @@
-C:\Users\sahil\source\repos\NumberDetails\bin\Debug\NumberDetails.exe.config
-C:\Users\sahil\source\repos\NumberDetails\bin\Debug\NumberDetails.exe
-C:\Users\sahil\source\repos\NumberDetails\bin\Debug\NumberDetails.pdb
-C:\Users\sahil\source\repos\NumberDetails\obj\Debug\NumberDetails.csproj.AssemblyReference.cache
-C:\Users\sahil\source\repos\NumberDetails\obj\Debug\NumberDetails.csproj.CoreCompileInputs.cache
-C:\Users\sahil\source\repos\NumberDetails\obj\Debug\NumberDetails.exe
-C:\Users\sahil\source\repos\NumberDetails\obj\Debug\NumberDetails.pdb
