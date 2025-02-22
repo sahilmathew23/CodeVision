@@ -17,7 +17,7 @@ def main():
         return
     
     uploaded_filename = sys.argv[1]
-    
+    model_name = sys.argv[2] 
     # Prompt or use the uploaded filename as the project name
     project_name = uploaded_filename  # Use the uploaded file name as the project name
     
@@ -34,7 +34,7 @@ def main():
     
     #this will call the model and enhance the code
     print("Starting enhance.py...\n")
-    run_script("enhance.py")
+    run_script("enhance.py", model_name) 
     print()
     print()
 

@@ -40,25 +40,26 @@ def upload_file():
         if 'file' not in request.files:
             return jsonify({"message": "No file part"}), 400
         file = request.files['file']
-        
+        model = request.form.get('model')  # Get selected model from form
+
         # If no file is selected
         if file.filename == '':
             return jsonify({"message": "No selected file"}), 400
-        
+
         # If file is valid
         if file and allowed_file(file.filename):
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
-            
-            # Automatically run run_pipeline.py with the uploaded file name as argument
+
+            # Automatically run run_pipeline.py with the uploaded file name and selected model
             try:
-                subprocess.run(["python", "run_pipeline.py", file.filename], check=True)
-                
+                subprocess.run(["python", "run_pipeline.py", file.filename, model], check=True)
+
                 # Define the path to the extracted zip file
                 extracted_file_path = '/workspaces/CodeVision1/output/ZIP'
-                
+
                 # Check if the extracted zip file exists
-                if os.path.exists(extracted_file_path):
+                if os.path.exists(os.path.join(extracted_file_path, "Extracted_files.zip")):
                     print(f"Extracted file ZIP path: {extracted_file_path}/Extracted_files.zip")
 
                     # Directly download the extracted file
@@ -70,8 +71,6 @@ def upload_file():
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
     return render_template('upload.html')
-
-
 
 # Route to serve the extracted .zip file
 @app.route('/download/<filename>')
