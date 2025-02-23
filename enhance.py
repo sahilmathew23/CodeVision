@@ -52,9 +52,10 @@ def call_gemini_api(prompt):
         print("Error: Gemini API key is not set.")
         return None
 
-    # Count tokens in the prompt
-    token_count = count_tokens(prompt)
-    print(f"Number of tokens in the prompt: {token_count}")
+    # Token count estimation
+    encoder = tiktoken.get_encoding("cl100k_base")
+    prompt_tokens = len(encoder.encode(prompt))
+    print(f"Number of tokens in the prompt: {prompt_tokens}")
 
     genai.configure(api_key=api_key)
     
