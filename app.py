@@ -72,12 +72,12 @@ def download_file(filename):
 def get_info():
     data = request.get_json()
     query = data.get('query', '')
-
+    model = data.get('model', '')
     if not query:
         return jsonify({"message": "No query provided"}), 400
 
     try:
-        result = subprocess.run(["python", "projectQuery.py", query], capture_output=True, text=True, check=True)
+        result = subprocess.run(["python", "projectQuery.py", query, model], capture_output=True, text=True, check=True)
         response_message = result.stdout.strip()
     except subprocess.CalledProcessError as e:
         response_message = f"Error processing query: {e}"

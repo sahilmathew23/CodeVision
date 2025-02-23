@@ -74,27 +74,32 @@
                 document.getElementById("chat-container").style.display = "block";
             }, 15000);
         });
+    
         document.getElementById("chat-btn").addEventListener("click", function () {
             let userInput = document.getElementById("chat-input").value;
+            let selectedModel = "{{ model }}";  // Retrieve model from template
+    
             fetch("/get-info", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ query: userInput })
+                body: JSON.stringify({ query: userInput, model: selectedModel })  // Include model in request
             })
             .then(response => response.json())
             .then(data => {
                 let responseTextArea = document.getElementById("response-textarea");
                 responseTextArea.style.display = "block";
-                responseTextArea.value = data.message;
+                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;  // Display model info
             })
             .catch(error => console.error("Error:", error));
         });
+    
         document.getElementById("clear-btn").addEventListener("click", function () {
             document.getElementById("response-textarea").value = "";
             document.getElementById("chat-input").value = "";
         });
     </script>
+    
 </body>
 </html>

@@ -41,10 +41,6 @@ def call_openai_api(prompt):
         print(f"Error calling OpenAI API: {e}")
         return None
 
-def count_tokens(prompt):
-    """Estimate the number of tokens in the prompt."""
-    return len(prompt.split())
-
 def call_gemini_api(prompt):
     """Call the Gemini API with the provided prompt and return the response."""
     api_key = os.getenv("GEMINI_API_KEY")
