@@ -65,11 +65,11 @@ if __name__ == "__main__":
     source_fileMergedOutput = "/workspaces/CodeVision1/output/merged_output.txt"
     source_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/enhanced_merged_output.txt"
     
-    destination_fileMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/merged_output.txt" 
-    destination_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/enhanced_merged_output.txt" 
+    destination_fileMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/merged_output.txt" 
+    destination_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt" 
     
     source_dir = "/workspaces/CodeVision1/output/enhancedClassFiles"
-    destination_dir = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/DetailedEnhancementInfo"
+    destination_dir = "/workspaces/CodeVision1/output/ZIP/Extracted/DetailedEnhancementInfo"
     move_file(source_fileMergedOutput, destination_fileMergedOutput)
     move_file(source_fileEnhancedMergedOutput, destination_fileEnhancedMergedOutput)
     move_files(source_dir, destination_dir)

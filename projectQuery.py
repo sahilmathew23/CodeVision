@@ -74,7 +74,7 @@ def process_query(user_query, model):
     """Generate a structured prompt and get a response."""
     # Define file paths
     prompt_template_path = "/workspaces/CodeVision1/input/promptForChat.txt"
-    class_content_path = "/workspaces/CodeVision1/output/ZIP/Extracted/GenAINumHandler/GenAINumHandler/enhanced_merged_output.txt"
+    class_content_path = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt"
 
     # Read prompt template
     prompt_template = read_file(prompt_template_path)

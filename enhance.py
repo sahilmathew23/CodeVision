@@ -100,9 +100,10 @@ def enhance(model_name):
     extracted_files = extract_files_from_merged_output(input_file)
     output_dir = "output/enhancedClassFiles"
     os.makedirs(output_dir, exist_ok=True)
-
+    with open("output/merged_output.txt", "r", encoding="utf-8") as file:
+        content = file.read()
     for file_name, file_content in extracted_files.items():
-        prompt = prompt_template.format(file_name=file_name, file_content_str=file_content)
+        prompt = prompt_template.format(file_name=file_name, file_content_str=content)
 
         if model_name == "gpt-4-turbo":
             output = call_openai_api(prompt)
