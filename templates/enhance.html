@@ -72,7 +72,7 @@
         document.getElementById("enhance-btn").addEventListener("click", function() {
             setTimeout(function() {
                 document.getElementById("chat-container").style.display = "block";
-            }, 15000);
+            }, 25000);
         });
     
         document.getElementById("chat-btn").addEventListener("click", function () {
@@ -99,6 +99,15 @@
             document.getElementById("response-textarea").value = "";
             document.getElementById("chat-input").value = "";
         });
+        document.getElementById("enhance-btn").addEventListener("click", function() {
+        let enhanceBtn = document.getElementById("enhance-btn");
+        
+        setTimeout(function() {
+            enhanceBtn.textContent = "Project Enhanced and Downloaded";  // Change button text
+            enhanceBtn.style.backgroundColor = "#007BFF"; // Change color to blue
+            document.getElementById("chat-container").style.display = "block";
+        }, 25000);
+    });
     </script>
     
 </body>
