@@ -70,11 +70,15 @@ def call_openai_api(prompt):
         print(f"Error calling OpenAI API: {e}")
         return None
 
-def process_query(user_query, model):
+def process_query(user_query, model, project_type):
     """Generate a structured prompt and get a response."""
     # Define file paths
     prompt_template_path = "/workspaces/CodeVision1/input/promptForChat.txt"
-    class_content_path = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt"
+    
+    if project_type == "raw":
+        class_content_path = "/workspaces/CodeVision1/output/merged_output.txt"
+    elif project_type == "enhanced":
+        class_content_path = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt"
 
     # Read prompt template
     prompt_template = read_file(prompt_template_path)
@@ -102,7 +106,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         user_query = sys.argv[1]
         model = sys.argv[2]
-        print(process_query(user_query, model))
+        project_type = sys.argv[3]
+        print(process_query(user_query, model, project_type))
        
     else:
         print("Error: No user query provided.")

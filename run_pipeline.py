@@ -26,11 +26,11 @@ def main():
     output_file = "/workspaces/CodeVision1/output/merged_output.txt"
     
     #this will combine the input in 1 file
-    print(f"Scanning project: {project_name}...")
-    print("Starting scanAndMerge.py...\n")
-    run_script("scanAndMerge.py", directory_to_scan, output_file)
-    print()
-    print()
+    #print(f"Scanning project: {project_name}...")
+    #print("Starting scanAndMerge.py...\n")
+    #run_script("scanAndMerge.py", directory_to_scan, output_file)
+    #print()
+    #print()
     
     #this will call the model and enhance the code
     print("Starting enhance.py...\n")
