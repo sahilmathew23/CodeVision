@@ -153,6 +153,17 @@
             chatBtn.disabled = false;
         });
     });
+
+        document.getElementById("clear-btn").addEventListener("click", function () {
+            let responseTextArea = document.getElementById("response-textarea");
+            let chatInput = document.getElementById("chat-input");
+
+            responseTextArea.value = ""; // Clear the textarea content
+            responseTextArea.style.display = "none"; // Hide the textarea
+            chatInput.value = ""; // Clear the chat input field
+        });
+
+    
     </script>
 </body>
 </html>
