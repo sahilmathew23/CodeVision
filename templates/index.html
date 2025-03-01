@@ -80,51 +80,62 @@
             <input type="text" id="chat-input" placeholder="Let's discuss the project with the power of AI!...">
             <button id="chat-btn">Get Info</button>
             <button id="clear-btn">Clear</button>
+            <button id="save-btn">Save Output</button>
         </div>
         <textarea id="response-textarea" readonly></textarea>
     </div>
 
     <script>
         document.getElementById("chat-btn").addEventListener("click", function () {
-        let chatBtn = document.getElementById("chat-btn");
-        let userInput = document.getElementById("chat-input").value;
-        let selectedModel = "{{ model }}";
-        let responseTextArea = document.getElementById("response-textarea");
+            let chatBtn = document.getElementById("chat-btn");
+            let userInput = document.getElementById("chat-input").value;
+            let selectedModel = "{{ model }}";
+            let responseTextArea = document.getElementById("response-textarea");
 
-        // Disable button and show loading state
-        chatBtn.textContent = "Loading...";
-        chatBtn.style.backgroundColor = "#FFA500";
-        chatBtn.disabled = true;
+            chatBtn.textContent = "Loading...";
+            chatBtn.style.backgroundColor = "#FFA500";
+            chatBtn.disabled = true;
 
-        fetch("/get-info-raw", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: userInput, model: selectedModel })
-        })
-        .then(response => response.json())
-        .then(data => {
-            responseTextArea.style.display = "block";
-            responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        })
-        .finally(() => {
-            // Re-enable button after response
-            chatBtn.textContent = "Get Info";
-            chatBtn.style.backgroundColor = "#4CAF50";
-            chatBtn.disabled = false;
+            fetch("/get-info-raw", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: userInput, model: selectedModel })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseTextArea.style.display = "block";
+                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            })
+            .finally(() => {
+                chatBtn.textContent = "Get Info";
+                chatBtn.style.backgroundColor = "#4CAF50";
+                chatBtn.disabled = false;
+            });
         });
-    });
 
-    // Clear button functionality
-    document.getElementById("clear-btn").addEventListener("click", function () {
-        document.getElementById("chat-input").value = "";
-        let responseTextArea = document.getElementById("response-textarea");
-        responseTextArea.value = "";
-        responseTextArea.style.display = "none"; // Hide the textarea after clearing
-    });
+        document.getElementById("clear-btn").addEventListener("click", function () {
+            document.getElementById("chat-input").value = "";
+            let responseTextArea = document.getElementById("response-textarea");
+            responseTextArea.value = "";
+            responseTextArea.style.display = "none";
+        });
 
+        document.getElementById("save-btn").addEventListener("click", function () {
+            let userInput = document.getElementById("chat-input").value;
+            let responseText = document.getElementById("response-textarea").value;
+            let combinedText = `User Input: ${userInput}\n\nResponse:\n${responseText}`;
+            
+            let blob = new Blob([combinedText], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "chat_output.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
     </script>
 </body>
 </html>
