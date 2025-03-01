@@ -57,6 +57,12 @@
             font-size: 16px;
             background-color: #fafafa;
         }
+        #loading {
+            display: none;
+            margin-top: 15px;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -73,9 +79,10 @@
         </div>
 
         <div id="chat-container">
-            <input type="text" id="chat-input" placeholder="Let's discuss the project...">
+            <input type="text" id="chat-input" placeholder="Let's discuss the project with the power of AI!...">
             <button id="chat-btn">Get Info</button>
             <button id="clear-btn">Clear</button>
+            <div id="loading">Fetching response, please wait...</div>
         </div>
         <textarea id="response-textarea" readonly></textarea>
     </div>
@@ -84,6 +91,11 @@
         document.getElementById("chat-btn").addEventListener("click", function () {
             let userInput = document.getElementById("chat-input").value;
             let selectedModel = "{{ model }}";
+            let loadingIndicator = document.getElementById("loading");
+            let responseTextArea = document.getElementById("response-textarea");
+            
+            loadingIndicator.style.display = "block"; // Show loading indicator
+            responseTextArea.style.display = "none"; // Hide previous response
 
             fetch("/get-info-raw", {
                 method: "POST",
@@ -92,11 +104,14 @@
             })
             .then(response => response.json())
             .then(data => {
-                let responseTextArea = document.getElementById("response-textarea");
-                responseTextArea.style.display = "block";
+                loadingIndicator.style.display = "none"; // Hide loading indicator
+                responseTextArea.style.display = "block"; // Show response
                 responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                loadingIndicator.style.display = "none";
+                console.error("Error:", error);
+            });
         });
 
         document.getElementById("clear-btn").addEventListener("click", function () {
