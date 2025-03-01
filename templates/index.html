@@ -38,6 +38,10 @@
         button:hover {
             background-color: #45a049;
         }
+        button:disabled {
+            background-color: #FFA500;
+            cursor: not-allowed;
+        }
         #chat-input {
             width: 75%;
             padding: 12px;
@@ -56,12 +60,6 @@
             border-radius: 4px;
             font-size: 16px;
             background-color: #fafafa;
-        }
-        #loading {
-            display: none;
-            margin-top: 15px;
-            font-size: 16px;
-            color: #333;
         }
     </style>
 </head>
@@ -82,20 +80,21 @@
             <input type="text" id="chat-input" placeholder="Let's discuss the project with the power of AI!...">
             <button id="chat-btn">Get Info</button>
             <button id="clear-btn">Clear</button>
-            <div id="loading">Fetching response, please wait...</div>
         </div>
         <textarea id="response-textarea" readonly></textarea>
     </div>
 
     <script>
         document.getElementById("chat-btn").addEventListener("click", function () {
+            let chatBtn = document.getElementById("chat-btn");
             let userInput = document.getElementById("chat-input").value;
             let selectedModel = "{{ model }}";
-            let loadingIndicator = document.getElementById("loading");
             let responseTextArea = document.getElementById("response-textarea");
-            
-            loadingIndicator.style.display = "block"; // Show loading indicator
-            responseTextArea.style.display = "none"; // Hide previous response
+
+            // Disable button and show loading state
+            chatBtn.textContent = "Loading...";
+            chatBtn.style.backgroundColor = "#FFA500";
+            chatBtn.disabled = true;
 
             fetch("/get-info-raw", {
                 method: "POST",
@@ -104,13 +103,17 @@
             })
             .then(response => response.json())
             .then(data => {
-                loadingIndicator.style.display = "none"; // Hide loading indicator
-                responseTextArea.style.display = "block"; // Show response
+                responseTextArea.style.display = "block";
                 responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
             })
             .catch(error => {
-                loadingIndicator.style.display = "none";
                 console.error("Error:", error);
+            })
+            .finally(() => {
+                // Re-enable button after response
+                chatBtn.textContent = "Get Info";
+                chatBtn.style.backgroundColor = "#4CAF50";
+                chatBtn.disabled = false;
             });
         });
 
