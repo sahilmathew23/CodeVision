@@ -68,6 +68,7 @@
         <input type="text" id="chat-input" placeholder="Let's discuss the project with CodeVision!...">
         <button id="chat-btn">GetInfo</button>
         <button id="clear-btn">Clear</button>
+        <button id="save-btn">Save Output</button>
     </div>
     <textarea id="response-textarea" readonly></textarea>
 
@@ -163,7 +164,19 @@
             chatInput.value = ""; // Clear the chat input field
         });
 
-    
+        document.getElementById("save-btn").addEventListener("click", function () {
+            let userInput = document.getElementById("chat-input").value;
+            let responseText = document.getElementById("response-textarea").value;
+            let combinedText = `User Input: ${userInput}\n\nResponse:\n${responseText}`;
+            
+            let blob = new Blob([combinedText], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "chat_output.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
     </script>
 </body>
 </html>
