@@ -117,27 +117,42 @@
         });
 
         document.getElementById("chat-btn").addEventListener("click", function () {
-            let userInput = document.getElementById("chat-input").value;
-            let selectedModel = "{{ model }}";
+        let chatBtn = document.getElementById("chat-btn");
+        let userInput = document.getElementById("chat-input").value;
+        let selectedModel = "{{ model }}";
+        let responseTextArea = document.getElementById("response-textarea");
 
-            fetch("/get-info", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: userInput, model: selectedModel })
-            })
-            .then(response => response.json())
-            .then(data => {
-                let responseTextArea = document.getElementById("response-textarea");
-                responseTextArea.style.display = "block";
-                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
-            })
-            .catch(error => console.error("Error:", error));
-        });
+        if (!userInput.trim()) {
+            return;
+        }
 
-        document.getElementById("clear-btn").addEventListener("click", function () {
-            document.getElementById("response-textarea").value = "";
-            document.getElementById("chat-input").value = "";
+        // Disable button and show loading state
+        chatBtn.textContent = "Loading...";
+        chatBtn.style.backgroundColor = "#FFA500";
+        chatBtn.disabled = true;
+
+        fetch("/get-info", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: userInput, model: selectedModel })
+        })
+        .then(response => response.json())
+        .then(data => {
+            responseTextArea.style.display = "block";
+            responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            responseTextArea.style.display = "block";
+            responseTextArea.value = "Error fetching response. Please try again.";
+        })
+        .finally(() => {
+            // Restore button state
+            chatBtn.textContent = "GetInfo";
+            chatBtn.style.backgroundColor = "#4CAF50";
+            chatBtn.disabled = false;
         });
+    });
     </script>
 </body>
 </html>
