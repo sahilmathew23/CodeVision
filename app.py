@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, redirect, url_for, send_from_directory
+from flask import Flask, request, render_template, jsonify, redirect, url_for, send_from_directory, send_file
 import os
 import subprocess
 
@@ -57,6 +57,7 @@ def enhance_file():
 
 @app.route('/download/<filename>')
 def download_file(filename):
+    EXTRACTED_FOLDER = "/workspaces/CodeVision1/output/ZIP"
     return send_from_directory(EXTRACTED_FOLDER, filename, as_attachment=True)
 
 @app.route('/get-info', methods=['POST'])
@@ -95,16 +96,24 @@ def get_raw_project_info():
 
 @app.route('/enhance-process', methods=['POST'])
 def enhance_process():
-    filename = request.form['filename']
-    model = request.form['model']
-
     try:
+        data = request.get_json()  # Get JSON data from the request
+        filename = data.get('filename')
+        model = data.get('model')
+
+        if not filename or not model:
+            return jsonify({"message": "Missing filename or model"}), 400
+
+        # Run the enhancement process
         subprocess.run(["python", "run_pipeline.py", filename, model], check=True)
-        extracted_file_path = '/workspaces/CodeVision1/output/ZIP'
-        if os.path.exists(os.path.join(extracted_file_path, "Extracted_files.zip")):
-            return send_from_directory(extracted_file_path, 'Extracted_files.zip', as_attachment=True)
+        
+        zip_file_path = '/workspaces/CodeVision1/output/ZIP/Extracted_files.zip'
+
+        if os.path.exists(zip_file_path):
+            return send_file(zip_file_path, as_attachment=True)  # Auto-download the file
         else:
             return jsonify({"message": "Extracted zip file not found."}), 500
+
     except subprocess.CalledProcessError as e:
         return jsonify({"message": f"Error in running pipeline: {e}"}), 500
 

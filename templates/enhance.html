@@ -74,11 +74,46 @@
     <script>
         document.getElementById("enhance-btn").addEventListener("click", function() {
             let enhanceBtn = document.getElementById("enhance-btn");
-            setTimeout(function() {
+            enhanceBtn.textContent = "Processing...";
+            enhanceBtn.style.backgroundColor = "#FFA500";
+            enhanceBtn.disabled = true;
+
+            fetch("/enhance-process", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ filename: "{{ filename }}", model: "{{ model }}" })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob(); // Convert response to a file blob
+                } else {
+                    throw new Error("Enhancement failed.");
+                }
+            })
+            .then(blob => {
+                // Create a temporary link to download the file
+                let downloadUrl = window.URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = "Extracted_files.zip";  // Auto-download with a predefined name
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                
+                // Update button text and color
                 enhanceBtn.textContent = "Project Enhanced and Downloaded";
                 enhanceBtn.style.backgroundColor = "#007BFF";
+                enhanceBtn.disabled = false;
+
+                // Show chat container after enhancement completes
                 document.getElementById("chat-container").style.display = "block";
-            }, 25000);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                enhanceBtn.textContent = "Enhance";
+                enhanceBtn.style.backgroundColor = "#4CAF50";
+                enhanceBtn.disabled = false;
+            });
         });
 
         document.getElementById("chat-btn").addEventListener("click", function () {
