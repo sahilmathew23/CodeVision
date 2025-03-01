@@ -86,41 +86,45 @@
 
     <script>
         document.getElementById("chat-btn").addEventListener("click", function () {
-            let chatBtn = document.getElementById("chat-btn");
-            let userInput = document.getElementById("chat-input").value;
-            let selectedModel = "{{ model }}";
-            let responseTextArea = document.getElementById("response-textarea");
+        let chatBtn = document.getElementById("chat-btn");
+        let userInput = document.getElementById("chat-input").value;
+        let selectedModel = "{{ model }}";
+        let responseTextArea = document.getElementById("response-textarea");
 
-            // Disable button and show loading state
-            chatBtn.textContent = "Loading...";
-            chatBtn.style.backgroundColor = "#FFA500";
-            chatBtn.disabled = true;
+        // Disable button and show loading state
+        chatBtn.textContent = "Loading...";
+        chatBtn.style.backgroundColor = "#FFA500";
+        chatBtn.disabled = true;
 
-            fetch("/get-info-raw", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: userInput, model: selectedModel })
-            })
-            .then(response => response.json())
-            .then(data => {
-                responseTextArea.style.display = "block";
-                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            })
-            .finally(() => {
-                // Re-enable button after response
-                chatBtn.textContent = "Get Info";
-                chatBtn.style.backgroundColor = "#4CAF50";
-                chatBtn.disabled = false;
-            });
+        fetch("/get-info-raw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: userInput, model: selectedModel })
+        })
+        .then(response => response.json())
+        .then(data => {
+            responseTextArea.style.display = "block";
+            responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            // Re-enable button after response
+            chatBtn.textContent = "Get Info";
+            chatBtn.style.backgroundColor = "#4CAF50";
+            chatBtn.disabled = false;
         });
+    });
 
-        document.getElementById("clear-btn").addEventListener("click", function () {
-            document.getElementById("response-textarea").value = "";
-            document.getElementById("chat-input").value = "";
-        });
+    // Clear button functionality
+    document.getElementById("clear-btn").addEventListener("click", function () {
+        document.getElementById("chat-input").value = "";
+        let responseTextArea = document.getElementById("response-textarea");
+        responseTextArea.value = "";
+        responseTextArea.style.display = "none"; // Hide the textarea after clearing
+    });
+
     </script>
 </body>
 </html>
