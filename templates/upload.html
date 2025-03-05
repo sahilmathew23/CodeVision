@@ -7,20 +7,21 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            align-items: flex-start;
         }
         .upload-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
-            padding: 25px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         }
         h2 {
             text-align: center;
@@ -109,6 +110,5 @@
         fileLabel.textContent = this.files.length > 0 ? this.files[0].name : "No file chosen";
     });
 </script>
-
 </body>
 </html>

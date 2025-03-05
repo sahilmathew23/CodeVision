@@ -7,87 +7,95 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
-        .container {
-            max-width: 800px;
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            text-align: center;
+        .page-container {
+            display: flex;
+            min-height: 100vh;
         }
-        .button-container, #chat-container {
-            margin-top: 30px;
+        .left-panel {
+            width: 300px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .right-panel {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+        }
+        .button-container {
+            margin-top: 20px;
         }
         button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 18px;
-            margin: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
         }
         button:hover {
             background-color: #45a049;
         }
-        button:disabled {
-            background-color: #FFA500;
-            cursor: not-allowed;
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
         #chat-input {
-            width: 75%;
-            padding: 12px;
-            font-size: 16px;
+            width: calc(100% - 22px);
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             margin-top: 10px;
         }
         #response-textarea {
-            display: none;
             width: 100%;
-            height: 180px;
-            margin-top: 20px;
-            padding: 12px;
+            height: calc(100vh - 60px);
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
-            background-color: #fafafa;
+            resize: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h3>Your project has been uploaded successfully.</h3>
-        
-        <div class="button-container">
-            <form action="/enhance" method="GET">
-                <input type="hidden" name="filename" value="{{ filename }}">
-                <input type="hidden" name="model" value="{{ model }}">
-                <button type="submit">Optimize Code</button>
-            </form>
-            <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 20px;">
-                <select id="method-select" style="padding: 8px; border-radius: 4px; min-width: 200px;">
+    <div class="page-container">
+        <div class="left-panel">
+            <h3>Project Analysis</h3>
+            
+            <div class="button-container">
+                <form action="/enhance" method="GET">
+                    <input type="hidden" name="filename" value="{{ filename }}">
+                    <input type="hidden" name="model" value="{{ model }}">
+                    <button type="submit">Optimize Code</button>
+                </form>
+                
+                <select id="method-select">
                     <option value="">Select a method...</option>
                 </select>
                 <button id="refactai-btn">RefactAI</button>
             </div>
-        </div>
 
-        <div id="chat-container">
-            <input type="text" id="chat-input" placeholder="Let's discuss the project with the power of AI...">
-            <button id="chat-btn">Get Info</button>
-            <button id="clear-btn">Clear</button>
-            <button id="save-btn">Save Output</button>
+            <div id="chat-container">
+                <input type="text" id="chat-input" placeholder="Ask about the project...">
+                <button id="chat-btn">Get Info</button>
+                <button id="clear-btn">Clear</button>
+                <button id="save-btn">Save Output</button>
+            </div>
         </div>
-        <textarea id="response-textarea" readonly></textarea>
+        
+        <div class="right-panel">
+            <textarea id="response-textarea" readonly></textarea>
+        </div>
     </div>
 
     <script>
