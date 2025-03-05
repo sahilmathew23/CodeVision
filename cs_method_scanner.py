@@ -1,19 +1,22 @@
 import os
 import re
 
-def extract_methods(file_content):
+def extract_methods_and_classes(file_content):
     # Pattern to match class definitions
     class_pattern = r'class\s+(\w+)'
     # Pattern to match method definitions while excluding loops
     method_pattern = r'(?<!for\s)(?<!foreach\s)(?<!while\s)(?:public|private|protected|internal|static|\s)+\s+[\w<>[\],\s]+\s+(\w+)\s*\([^)]*\)'
     
     methods = []
+    classes = []
     
     # Find all class definitions
-    classes = re.finditer(class_pattern, file_content)
+    class_matches = re.finditer(class_pattern, file_content)
     
-    for class_match in classes:
+    for class_match in class_matches:
         class_name = class_match.group(1)
+        classes.append(class_name)
+        
         # Find the class block using basic bracket matching
         start_pos = class_match.end()
         
@@ -25,10 +28,11 @@ def extract_methods(file_content):
             if method_name != class_name and not any(method_name.startswith(loop) for loop in ['for', 'foreach', 'while']):
                 methods.append(f"{class_name}.{method_name}")
     
-    return methods
+    return classes, methods
 
 def scan_cs_files(directory):
     all_methods = []
+    all_classes = []
     
     for root, _, files in os.walk(directory):
         for file in files:
@@ -37,17 +41,21 @@ def scan_cs_files(directory):
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        methods = extract_methods(content)
+                        classes, methods = extract_methods_and_classes(content)
+                        all_classes.extend(classes)
                         all_methods.extend(methods)
                 except Exception as e:
                     print(f"Error processing {file_path}: {str(e)}")
     
-    return sorted(all_methods)
+    # Format entries for dropdown
+    dropdown_entries = []
+    dropdown_entries.extend([f"class:{c}" for c in sorted(set(all_classes))])
+    dropdown_entries.extend(sorted(all_methods))
+    
+    return dropdown_entries
 
 if __name__ == "__main__":
     scan_path = "/workspaces/CodeVision1/output/ZIP/Extracted/"
-    
-    methods = scan_cs_files(scan_path)
-    
-    for method in methods:
-        print(method)
+    entries = scan_cs_files(scan_path)
+    for entry in entries:
+        print(entry)

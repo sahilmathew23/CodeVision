@@ -120,43 +120,50 @@ def retrieve_related_methods(function_name, visited_methods=None):
 
     return related_methods
 
-def retrieve_relevant_code(function_name):
+def retrieve_relevant_code(target_name, target_type='method'):
     with open("code_index.json", "r", encoding="utf-8") as json_file:
         code_data = json.load(json_file)
 
     relevant_files = []
-    all_related_methods = set()
+    all_related_items = set()
 
-    # Find the function and its directly called methods
     for file, file_data in code_data.items():
-        # Check if the method name exists in any class's methods
-        for method in file_data["methods"]:
-            if method == function_name:  # Now comparing with just the method name
+        if target_type == 'class':
+            if target_name in file_data["classes"]:
                 relevant_files.append(file)
-                all_related_methods.add(function_name)
-                all_related_methods.update(retrieve_related_methods(function_name))
-                break
+                all_related_items.add(target_name)
+                # Add all methods of this class
+                for method in file_data["methods"]:
+                    if method.startswith(f"{target_name}."):
+                        all_related_items.add(method)
+        else:  # method
+            for method in file_data["methods"]:
+                if method.endswith(f".{target_name}"):
+                    relevant_files.append(file)
+                    all_related_items.add(target_name)
+                    all_related_items.update(retrieve_related_methods(target_name))
+                    break
 
     if not relevant_files:
-        return None, []  # Return consistent tuple when no code is found
+        return None, []
 
-    # Retrieve and combine all related methods' code
     combined_code = ""
     for file in relevant_files:
         with open(file, "r", encoding="utf-8") as f:
             combined_code += f"\n\n// File: " + file + "\n" + f.read()
 
-    return combined_code, list(all_related_methods)
+    return combined_code, list(all_related_items)
 
 
 # Step 3: Retrieve code context using Gemini Flash
-def get_code_summary(code_snippet, method_name=None):
+def get_code_summary(code_snippet, target_name=None, target_type='method'):
     """
     Enhanced code analysis for refactoring decision support.
     
     Args:
         code_snippet (str): The code to analyze
-        method_name (str, optional): The name of the method to analyze
+        target_name (str, optional): The name of the method or class to analyze
+        target_type (str, optional): The type of the target ('method' or 'class')
     
     Returns:
         dict: Structured analysis results
@@ -167,7 +174,7 @@ def get_code_summary(code_snippet, method_name=None):
         return None
 
     analysis_data = {
-        "method_name": method_name,
+        "target_name": target_name,
         "complexity_metrics": {},
         "dependencies": [],
         "code_smells": [],
@@ -180,27 +187,27 @@ def get_code_summary(code_snippet, method_name=None):
         with open("code_index.json", "r", encoding="utf-8") as json_file:
             code_data = json.load(json_file)
             
-        if method_name:
+        if target_name:
             # Analyze callers
             callers = []
             for file_data in code_data.values():
                 for caller, called in file_data["method_calls"]:
-                    if called == method_name:
+                    if called == target_name:
                         callers.append(caller)
             analysis_data["dependencies"] = callers
 
             # Get complexity metrics
             for file_data in code_data.values():
-                if method_name in file_data["methods"]:
+                if target_name in file_data["methods"]:
                     complexity = file_data["cyclomatic_complexity"]
-                    metrics = complexity["per_method_metrics"].get(method_name, {})
+                    metrics = complexity["per_method_metrics"].get(target_name, {})
                     analysis_data["complexity_metrics"] = {
-                        "cyclomatic_complexity": complexity["per_method"].get(method_name, 'N/A'),
+                        "cyclomatic_complexity": complexity["per_method"].get(target_name, 'N/A'),
                         "detailed_metrics": metrics
                     }
 
         # Prepare enhanced prompt for Gemini
-        prompt = f"""Analyze this code and provide:
+        prompt = f"""Analyze this {target_type} and provide:
 1. Brief summary
 2. Code smells identified
 3. Specific refactoring suggestions
@@ -269,25 +276,28 @@ def visualize_dependencies():
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Code Analysis Tool')
-    parser.add_argument('--method', default='LogMessage', help='Method name to analyze')
+    parser.add_argument('--target', required=True, help='Target name to analyze (class or method name)')
+    parser.add_argument('--type', choices=['class', 'method'], default='method', help='Type of target to analyze')
+    parser.add_argument('--refact', action='store_true', help='Run in refactoring mode')
     args = parser.parse_args()
 
     scan_project("/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler")
-    code_snippet, related_methods = retrieve_relevant_code(args.method)
+    code_snippet, related_items = retrieve_relevant_code(args.target, args.type)
     
     if code_snippet is None:
-        print(f"No relevant code found for method: {args.method}")
+        print(f"No relevant code found for {args.type}: {args.target}")
         exit(1)
         
-    print("Code Snippet:", code_snippet)
-    print("Related Methods:", related_methods)
+    print(f"Code Snippet: {code_snippet}")
+    print(f"Related Items: {related_items}")
     
-    analysis = get_code_summary(code_snippet, args.method)
+    analysis = get_code_summary(code_snippet, args.target, args.type)
     if analysis:
-        print(f"Method: {analysis['method_name']}")
+        print(f"Target: {analysis['target_name']}")
         print(f"Complexity: {analysis['complexity_metrics']}")
         print(f"Code Smells: {analysis['code_smells']}")
         print(f"Refactoring Suggestions: {analysis['refactoring_suggestions']}")
         print(f"Detailed Summary: {analysis['summary']}")
 
-    visualize_dependencies()  # Optional
+    if not args.refact:
+        visualize_dependencies()

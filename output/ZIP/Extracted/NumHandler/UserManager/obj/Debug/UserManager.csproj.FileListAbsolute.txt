@@ -1,0 +1,6 @@
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\bin\Debug\UserManager.dll
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\bin\Debug\UserManager.pdb
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\obj\Debug\UserManager.csproj.AssemblyReference.cache
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\obj\Debug\UserManager.csproj.CoreCompileInputs.cache
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\obj\Debug\UserManager.dll
+C:\Users\sahil\source\repos\GenAINumHandler\UserManager\obj\Debug\UserManager.pdb

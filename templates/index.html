@@ -115,32 +115,38 @@
     </div>
 
     <script>
-        // Add method list loading code at the beginning
+        // Add method and class list loading code at the beginning
         fetch('/get-methods')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('method-select');
-                data.methods.forEach(method => {
+                data.methods.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = method;
-                    option.textContent = method;
+                    option.value = item;
+                    // Format display text differently for classes and methods
+                    if (item.startsWith('class:')) {
+                        option.textContent = `📁 ${item.substring(6)} (Class)`;
+                    } else {
+                        option.textContent = `🔧 ${item}`;
+                    }
                     select.appendChild(option);
                 });
             })
-            .catch(error => console.error('Error loading methods:', error));
+            .catch(error => console.error('Error loading methods and classes:', error));
 
-        // Add RefactAI button handler
+        // Modify RefactAI button handler
         document.getElementById("refactai-btn").addEventListener("click", function() {
             let refactBtn = document.getElementById("refactai-btn");
-            let selectedMethod = document.getElementById("method-select").value;
+            let selected = document.getElementById("method-select").value;
             
-            if (!selectedMethod) {
-                alert("Please select a method to analyze");
+            if (!selected) {
+                alert("Please select a class or method to analyze");
                 return;
             }
 
-            const methodParts = selectedMethod.split('.');
-            const methodName = methodParts[1];
+            const isClass = selected.startsWith('class:');
+            const targetName = isClass ? selected.substring(6) : selected.split('.')[1];
+            const targetType = isClass ? 'class' : 'method';
 
             refactBtn.textContent = "Processing...";
             refactBtn.style.backgroundColor = "#FFA500";
@@ -148,14 +154,15 @@
 
             let responseTextArea = document.getElementById("response-textarea");
             responseTextArea.style.display = "block";
-            responseTextArea.value = "Analyzing code structure and generating refactoring suggestions...\n";
+            responseTextArea.value = `Analyzing ${targetType} structure and generating refactoring suggestions...\n`;
 
             fetch("/refactai", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     filename: "{{ filename }}",
-                    method_name: methodName
+                    target_name: targetName,
+                    target_type: targetType
                 })
             })
             .then(response => response.json())

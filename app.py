@@ -126,14 +126,18 @@ def analyze_code():
     try:
         data = request.get_json()
         filename = data.get('filename')
-        method_name = data.get('method_name', 'LogMessage')  # Default to LogMessage if not provided
+        target_name = data.get('target_name')
+        target_type = data.get('target_type', 'method')  # 'method' or 'class'
         
-        if not filename:
-            return jsonify({"message": "Missing filename"}), 400
+        if not filename or not target_name:
+            return jsonify({"message": "Missing filename or target name"}), 400
 
         # Determine which mode to use based on the endpoint
         is_refact = request.endpoint == 'refactai'
-        command = ["python", "core.py", "--method", method_name]
+        command = ["python", "core.py", 
+                  "--target", target_name,
+                  "--type", target_type]
+        
         if is_refact:
             command.append("--refact")
 
@@ -169,4 +173,4 @@ def get_methods():
         return jsonify({"message": f"Error getting methods: {e.stderr}"}), 500
 
 if __name__ == '__main__':
-    app.run(port=5002, debug=True)
+    app.run(port=5001, debug=True)
