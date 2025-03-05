@@ -73,23 +73,24 @@
             <h3>Project Analysis</h3>
             
             <div class="button-container">
-                <form action="/enhance" method="GET">
-                    <input type="hidden" name="filename" value="{{ filename }}">
-                    <input type="hidden" name="model" value="{{ model }}">
-                    <button type="submit">Optimize Code</button>
-                </form>
-                
                 <select id="method-select">
                     <option value="">Select a method...</option>
                 </select>
                 <button id="refactai-btn">RefactAI</button>
-            </div>
 
-            <div id="chat-container">
-                <input type="text" id="chat-input" placeholder="Ask about the project...">
-                <button id="chat-btn">Get Info</button>
-                <button id="clear-btn">Clear</button>
-                <button id="save-btn">Export</button>
+                <div id="chat-container">
+                    <input type="text" id="chat-input" placeholder="Ask about the project...">
+                    <button id="chat-btn">Get Info</button>
+                    <button id="clear-btn">Clear</button>
+                    <button id="save-btn">Export</button>
+                    
+                    <p style="margin: 20px 0 5px; color: #666; text-align: center;">Optimize your entire project in a click</p>
+                    <form action="/enhance" method="GET">
+                        <input type="hidden" name="filename" value="{{ filename }}">
+                        <input type="hidden" name="model" value="{{ model }}">
+                        <button type="submit">Optimize Code</button>
+                    </form>
+                </div>
             </div>
         </div>
         
