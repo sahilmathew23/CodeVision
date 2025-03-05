@@ -73,6 +73,12 @@
                 <input type="hidden" name="model" value="{{ model }}">
                 <button type="submit">Optimize Code</button>
             </form>
+            <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 20px;">
+                <select id="method-select" style="padding: 8px; border-radius: 4px; min-width: 200px;">
+                    <option value="">Select a method...</option>
+                </select>
+                <button id="refactai-btn">RefactAI</button>
+            </div>
         </div>
 
         <div id="chat-container">
@@ -85,6 +91,65 @@
     </div>
 
     <script>
+        // Add method list loading code at the beginning
+        fetch('/get-methods')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('method-select');
+                data.methods.forEach(method => {
+                    const option = document.createElement('option');
+                    option.value = method;
+                    option.textContent = method;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error loading methods:', error));
+
+        // Add RefactAI button handler
+        document.getElementById("refactai-btn").addEventListener("click", function() {
+            let refactBtn = document.getElementById("refactai-btn");
+            let selectedMethod = document.getElementById("method-select").value;
+            
+            if (!selectedMethod) {
+                alert("Please select a method to analyze");
+                return;
+            }
+
+            const methodParts = selectedMethod.split('.');
+            const methodName = methodParts[1];
+
+            refactBtn.textContent = "Processing...";
+            refactBtn.style.backgroundColor = "#FFA500";
+            refactBtn.disabled = true;
+
+            let responseTextArea = document.getElementById("response-textarea");
+            responseTextArea.style.display = "block";
+            responseTextArea.value = "Analyzing code structure and generating refactoring suggestions...\n";
+
+            fetch("/refactai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    filename: "{{ filename }}",
+                    method_name: methodName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseTextArea.value = `Code Analysis Results:\n\n${data.message}`;
+                refactBtn.textContent = "Analysis Complete";
+                refactBtn.style.backgroundColor = "#007BFF";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                responseTextArea.value = "Error during analysis. Please try again.";
+            })
+            .finally(() => {
+                refactBtn.disabled = false;
+                document.getElementById("chat-container").style.display = "block";
+            });
+        });
+
         document.getElementById("chat-btn").addEventListener("click", function () {
             let chatBtn = document.getElementById("chat-btn");
             let userInput = document.getElementById("chat-input").value;

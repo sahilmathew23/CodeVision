@@ -129,13 +129,16 @@ def retrieve_relevant_code(function_name):
 
     # Find the function and its directly called methods
     for file, file_data in code_data.items():
-        if function_name in file_data["methods"]:
-            relevant_files.append(file)
-            all_related_methods.add(function_name)  # Add the function itself
-            all_related_methods.update(retrieve_related_methods(function_name))
+        # Check if the method name exists in any class's methods
+        for method in file_data["methods"]:
+            if method == function_name:  # Now comparing with just the method name
+                relevant_files.append(file)
+                all_related_methods.add(function_name)
+                all_related_methods.update(retrieve_related_methods(function_name))
+                break
 
     if not relevant_files:
-        return "No relevant code found."
+        return None, []  # Return consistent tuple when no code is found
 
     # Retrieve and combine all related methods' code
     combined_code = ""
@@ -264,11 +267,22 @@ def visualize_dependencies():
 
 # Example Usage
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Code Analysis Tool')
+    parser.add_argument('--method', default='LogMessage', help='Method name to analyze')
+    args = parser.parse_args()
+
     scan_project("/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler")
-    code_snippet, related_methods = retrieve_relevant_code("LogMessage")
+    code_snippet, related_methods = retrieve_relevant_code(args.method)
+    
+    if code_snippet is None:
+        print(f"No relevant code found for method: {args.method}")
+        exit(1)
+        
     print("Code Snippet:", code_snippet)
     print("Related Methods:", related_methods)
-    analysis = get_code_summary(code_snippet, "LogMessage")
+    
+    analysis = get_code_summary(code_snippet, args.method)
     if analysis:
         print(f"Method: {analysis['method_name']}")
         print(f"Complexity: {analysis['complexity_metrics']}")

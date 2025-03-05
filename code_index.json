@@ -1,1 +1,636 @@
-{}
+{
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/Program.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/Program.cs",
+        "classes": [
+            "Program"
+        ],
+        "methods": [
+            "Main",
+            "DataHandler",
+            "UserManager",
+            "Logger"
+        ],
+        "dependencies": [
+            "System",
+            "InputProcessor",
+            "UserManagement",
+            "LoggingService"
+        ],
+        "method_calls": [
+            [
+                "Main",
+                "WriteLine"
+            ],
+            [
+                "Main",
+                "DataHandler"
+            ],
+            [
+                "Main",
+                "ProcessData"
+            ],
+            [
+                "Main",
+                "InfiniteLoop"
+            ],
+            [
+                "Main",
+                "HardCodedValues"
+            ],
+            [
+                "Main",
+                "UnusedMethod"
+            ],
+            [
+                "Main",
+                "InefficientStringConcatenation"
+            ],
+            [
+                "Main",
+                "ExceptionSwallowing"
+            ],
+            [
+                "Main",
+                "UserManager"
+            ],
+            [
+                "Main",
+                "ManageUsers"
+            ],
+            [
+                "Main",
+                "Logger"
+            ],
+            [
+                "Main",
+                "LogMessage"
+            ]
+        ],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {
+                "Main": 1
+            },
+            "per_method_metrics": {
+                "Main": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                }
+            }
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.GlobalUsings.g.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.GlobalUsings.g.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System",
+            "System.Reflection"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.AssemblyInfo.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.AssemblyInfo.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System",
+            "System.Reflection"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs",
+        "classes": [
+            "UserManager"
+        ],
+        "methods": [
+            "ManageUsers"
+        ],
+        "dependencies": [],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {
+                "ManageUsers": 1
+            },
+            "per_method_metrics": {
+                "ManageUsers": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                }
+            }
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/Properties/AssemblyInfo.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/Properties/AssemblyInfo.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System.Reflection",
+            "System.Runtime.CompilerServices",
+            "System.Runtime.InteropServices"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System",
+            "System.Reflection"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Logger.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Logger.cs",
+        "classes": [
+            "Logger"
+        ],
+        "methods": [
+            "LogMessage"
+        ],
+        "dependencies": [],
+        "method_calls": [
+            [
+                "LogMessage",
+                "StreamWriter"
+            ],
+            [
+                "LogMessage",
+                "WriteLine"
+            ],
+            [
+                "LogMessage",
+                "WriteLine"
+            ],
+            [
+                "LogMessage",
+                "Close"
+            ]
+        ],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {
+                "LogMessage": 1
+            },
+            "per_method_metrics": {
+                "LogMessage": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                }
+            }
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Properties/AssemblyInfo.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Properties/AssemblyInfo.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System.Reflection",
+            "System.Runtime.CompilerServices",
+            "System.Runtime.InteropServices"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System",
+            "System.Reflection"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/DataHandler.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/DataHandler.cs",
+        "classes": [
+            "DataHandler"
+        ],
+        "methods": [
+            "ProcessData",
+            "InfiniteLoop",
+            "HardCodedValues",
+            "UnusedMethod",
+            "InefficientStringConcatenation",
+            "ExceptionSwallowing"
+        ],
+        "dependencies": [
+            "System"
+        ],
+        "method_calls": [
+            [
+                "ProcessData",
+                "WriteLine"
+            ],
+            [
+                "ProcessData",
+                "for"
+            ],
+            [
+                "ProcessData",
+                "WriteLine"
+            ],
+            [
+                "InfiniteLoop",
+                "while"
+            ],
+            [
+                "InfiniteLoop",
+                "WriteLine"
+            ],
+            [
+                "HardCodedValues",
+                "WriteLine"
+            ],
+            [
+                "InefficientStringConcatenation",
+                "for"
+            ]
+        ],
+        "cyclomatic_complexity": {
+            "overall": 5,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 1,
+                "for_loops": 2,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 1,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {
+                "ProcessData": 2,
+                "InfiniteLoop": 2,
+                "HardCodedValues": 1,
+                "UnusedMethod": 1,
+                "InefficientStringConcatenation": 2,
+                "ExceptionSwallowing": 2
+            },
+            "per_method_metrics": {
+                "ProcessData": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 1,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
+                "InfiniteLoop": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 1,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
+                "HardCodedValues": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
+                "UnusedMethod": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
+                "InefficientStringConcatenation": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 1,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
+                "ExceptionSwallowing": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 1,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                }
+            }
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/Properties/AssemblyInfo.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/Properties/AssemblyInfo.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System.Reflection",
+            "System.Runtime.CompilerServices",
+            "System.Runtime.InteropServices"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs",
+        "classes": [],
+        "methods": [],
+        "dependencies": [
+            "System",
+            "System.Reflection"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 1,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 0,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {}
+        }
+    }
+}

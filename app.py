@@ -39,6 +39,8 @@ def upload_file():
             output_file = "/workspaces/CodeVision1/output/merged_output.txt"
             subprocess.run(["python", "scanAndMerge.py", directory_to_scan, output_file], check=True)
             subprocess.run(["python", "ExtractZIP.py"], check=True)
+            subprocess.run(["python", "cs_method_scanner.py"], check=True)
+            
             return redirect(url_for('index_page', filename=file.filename, model=model))
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
@@ -117,6 +119,54 @@ def enhance_process():
 
     except subprocess.CalledProcessError as e:
         return jsonify({"message": f"Error in running pipeline: {e}"}), 500
+
+@app.route('/analyze-structure', methods=['POST'])
+@app.route('/refactai', methods=['POST'])
+def analyze_code():
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        method_name = data.get('method_name', 'LogMessage')  # Default to LogMessage if not provided
+        
+        if not filename:
+            return jsonify({"message": "Missing filename"}), 400
+
+        # Determine which mode to use based on the endpoint
+        is_refact = request.endpoint == 'refactai'
+        command = ["python", "core.py", "--method", method_name]
+        if is_refact:
+            command.append("--refact")
+
+        # Run the core.py script
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        
+        # For structure analysis, include graph info
+        message = result.stdout
+        if not is_refact and os.path.exists("dependencies_graph.png"):
+            message += "\n\nCheck the dependencies graph in the output folder."
+        
+        # Return the analysis results
+        return jsonify({"message": message})
+
+    except subprocess.CalledProcessError as e:
+        error_type = "RefactAI" if is_refact else "Analysis"
+        return jsonify({"message": f"Error in {error_type}: {e.stderr}"}), 500
+
+@app.route('/get-methods')
+def get_methods():
+    try:
+        # Run the cs_method_scanner and capture its output
+        result = subprocess.run(["python", "cs_method_scanner.py"], 
+                              capture_output=True, 
+                              text=True, 
+                              check=True)
+        
+        # Split the output into individual methods
+        methods = [method.strip() for method in result.stdout.split('\n') if method.strip()]
+        
+        return jsonify({"methods": methods})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"message": f"Error getting methods: {e.stderr}"}), 500
 
 if __name__ == '__main__':
     app.run(port=5002, debug=True)

@@ -73,6 +73,21 @@
     <textarea id="response-textarea" readonly></textarea>
 
     <script>
+        // Add this at the beginning of your script section
+        // Fetch the method list when page loads
+        fetch('/get-methods')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('method-select');
+                data.methods.forEach(method => {
+                    const option = document.createElement('option');
+                    option.value = method;
+                    option.textContent = method;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error loading methods:', error));
+
         document.getElementById("enhance-btn").addEventListener("click", function() {
             let enhanceBtn = document.getElementById("enhance-btn");
             enhanceBtn.textContent = "Processing...";
