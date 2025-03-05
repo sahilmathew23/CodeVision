@@ -90,19 +90,36 @@
             animation: button-loading 0.8s linear infinite;
         }
 
+        /* Update select style */
         select {
-            width: 100%;
+            width: calc(100% - 16px);  /* Account for padding */
             padding: 8px;
             border-radius: 4px;
             margin: 10px 0;
+            border: 1px solid #ccc;
+            background-color: white;
         }
-        #chat-input {
-            width: calc(100% - 22px);
-            padding: 10px;
+
+        /* Add file input style */
+        input[type="file"] {
+            width: calc(100% - 16px);  /* Match select width */
+            padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            margin-top: 10px;
+            margin: 10px 0;
+            font-size: 13px;
         }
+
+        /* Update chat input style to match */
+        #chat-input {
+            width: calc(100% - 16px);  /* Match other inputs */
+            padding: 8px;              /* Match other inputs padding */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
         #response-textarea {
             width: 100%;
             height: calc(100vh - 60px);

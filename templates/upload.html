@@ -36,17 +36,17 @@
             color: #333;
         }
         select, input[type="file"] {
-            width: 100%;
-            padding: 12px;
+            width: calc(100% - 24px);  /* Account for padding */
+            padding: 8px;              /* Reduced from 12px */
             margin-bottom: 20px;
             border: 1px solid #ccc;
-            border-radius: 8px;
+            border-radius: 4px;        /* Reduced from 8px */
             background-color: #fafafa;
-            font-size: 16px;
+            font-size: 13px;           /* Reduced from 16px */
         }
         .file-label {
             display: block;
-            font-size: 14px;
+            font-size: 13px;           /* Reduced from 14px */
             color: #666;
             margin-top: -15px;
             margin-bottom: 10px;
@@ -89,12 +89,12 @@
             opacity: 0.8;
         }
 
-        /* Update loading button size */
+        /* Update button loading animation size */
         button.loading::after {
             content: "";
-            width: 16px;          /* Reduced from 20px */
-            height: 16px;         /* Reduced from 20px */
-            margin-left: 8px;     /* Reduced from 10px */
+            width: 14px;               /* Reduced from 16px */
+            height: 14px;              /* Reduced from 16px */
+            margin-left: 6px;          /* Reduced from 8px */
             border: 2px solid #ffffff;
             border-radius: 50%;
             border-top-color: transparent;
