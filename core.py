@@ -33,6 +33,37 @@ def calculate_cyclomatic_complexity(code):
 
     return complexity, metrics
 
+def calculate_class_complexity(code, class_name):
+    """Calculate complexity metrics for a specific class."""
+    # Find the class block
+    class_pattern = rf'class\s+{class_name}\s*{{([^{{}}]*(?:{{[^{{}}]*}}[^{{}}]*)*)}}'
+    class_match = re.search(class_pattern, code, re.DOTALL)
+    
+    if not class_match:
+        return None, None
+        
+    class_code = class_match.group(1)
+    
+    # Calculate basic class metrics
+    class_metrics = {
+        "properties": len(re.findall(r'(?:public|private|protected)\s+\w+\s+\w+\s*{(?:\s*get\s*;\s*set\s*;|\s*{\s*.*?\s*}\s*)*\s*}', class_code)),
+        "methods": len(re.findall(r'(?:public|private|protected)\s+\w+\s+\w+\s*\(.*?\)\s*{', class_code)),
+        "fields": len(re.findall(r'(?:public|private|protected)\s+\w+\s+\w+\s*;', class_code)),
+        "nested_classes": len(re.findall(r'class\s+\w+', class_code)),
+        "interfaces_implemented": len(re.findall(r':\s*([^{]+)', class_code.split('\n')[0])),
+    }
+    
+    # Calculate weighted class complexity
+    complexity = (
+        class_metrics["properties"] * 0.5 +
+        class_metrics["methods"] * 1.0 +
+        class_metrics["fields"] * 0.3 +
+        class_metrics["nested_classes"] * 2.0 +
+        class_metrics["interfaces_implemented"] * 0.5
+    )
+    
+    return complexity, class_metrics
+
 # Function to extract classes, methods, function calls, and dependencies
 def parse_csharp_code(file_path):
     with open(file_path, "r", encoding="utf-8") as file:
@@ -59,6 +90,15 @@ def parse_csharp_code(file_path):
     # Calculate overall complexity and metrics
     overall_complexity, overall_metrics = calculate_cyclomatic_complexity(code)
 
+    # Calculate class complexities
+    class_complexities = {}
+    class_metrics = {}
+    for class_name in classes:
+        complexity, metrics = calculate_class_complexity(code, class_name)
+        if complexity:
+            class_complexities[class_name] = complexity
+            class_metrics[class_name] = metrics
+
     # Extract method calls
     method_calls = []
     method_call_pattern = r'(\w+)\s*\((.*?)\)\s*;?'
@@ -79,7 +119,9 @@ def parse_csharp_code(file_path):
             "overall": overall_complexity,
             "overall_metrics": overall_metrics,
             "per_method": method_complexities,
-            "per_method_metrics": method_metrics
+            "per_method_metrics": method_metrics,
+            "per_class": class_complexities,
+            "per_class_metrics": class_metrics
         }
     }
 
@@ -138,7 +180,8 @@ def retrieve_relevant_code(target_name, target_type='method'):
                         all_related_items.add(method)
         else:  # method
             for method in file_data["methods"]:
-                if method.endswith(f".{target_name}"):
+                # Fix: Case-insensitive comparison for more robust matching
+                if method.lower() == target_name.lower():
                     relevant_files.append(file)
                     all_related_items.add(target_name)
                     all_related_items.update(retrieve_related_methods(target_name))
@@ -196,17 +239,31 @@ def get_code_summary(code_snippet, target_name=None, target_type='method'):
                         callers.append(caller)
             analysis_data["dependencies"] = callers
 
-            # Get complexity metrics
+            # Get complexity metrics based on target type
             for file_data in code_data.values():
-                if target_name in file_data["methods"]:
+                if target_type == 'class' and target_name in file_data["classes"]:
                     complexity = file_data["cyclomatic_complexity"]
-                    metrics = complexity["per_method_metrics"].get(target_name, {})
+                    class_complexity = complexity["per_class"].get(target_name, 'N/A')
+                    class_metrics = complexity["per_class_metrics"].get(target_name, {})
                     analysis_data["complexity_metrics"] = {
-                        "cyclomatic_complexity": complexity["per_method"].get(target_name, 'N/A'),
-                        "detailed_metrics": metrics
+                        "class_complexity": class_complexity,
+                        "detailed_metrics": class_metrics,
+                        "methods": {
+                            method: complexity["per_method"].get(method, 'N/A')
+                            for method in file_data["methods"]
+                            if method.startswith(f"{target_name}.")
+                        }
+                    }
+                elif target_type == 'method' and target_name in file_data["methods"]:
+                    complexity = file_data["cyclomatic_complexity"]
+                    method_complexity = complexity["per_method"].get(target_name, 'N/A')
+                    method_metrics = complexity["per_method_metrics"].get(target_name, {})
+                    analysis_data["complexity_metrics"] = {
+                        "cyclomatic_complexity": method_complexity,
+                        "detailed_metrics": method_metrics
                     }
 
-        # Prepare enhanced prompt for Gemini
+        # Update the prompt to include appropriate metrics
         prompt = f"""Analyze this {target_type} and provide:
 1. Brief summary
 2. Code smells identified
@@ -219,6 +276,9 @@ Code:
 
 Current metrics:
 {json.dumps(analysis_data["complexity_metrics"], indent=2)}
+
+Additional context for {target_type}:
+- {'Class methods and their complexities' if target_type == 'class' else 'Method details'}
 """
 
         encoder = tiktoken.get_encoding("cl100k_base")

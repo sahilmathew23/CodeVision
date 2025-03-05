@@ -100,7 +100,9 @@
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }
-            }
+            },
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.GlobalUsings.g.cs": {
@@ -126,7 +128,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs": {
@@ -155,7 +159,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/obj/Debug/net7.0/DataProcessorMain.AssemblyInfo.cs": {
@@ -184,7 +190,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs": {
@@ -231,7 +239,9 @@
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }
-            }
+            },
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/Properties/AssemblyInfo.cs": {
@@ -261,7 +271,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
@@ -290,7 +302,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Logger.cs": {
@@ -354,6 +368,18 @@
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }
+            },
+            "per_class": {
+                "Logger": 1.0
+            },
+            "per_class_metrics": {
+                "Logger": {
+                    "properties": 0,
+                    "methods": 1,
+                    "fields": 0,
+                    "nested_classes": 0,
+                    "interfaces_implemented": 0
+                }
             }
         }
     },
@@ -384,7 +410,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
@@ -413,7 +441,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/DataHandler.cs": {
@@ -571,7 +601,9 @@
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }
-            }
+            },
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/Properties/AssemblyInfo.cs": {
@@ -601,7 +633,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/InputProcessor/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
@@ -630,7 +664,9 @@
                 "logical_ops": 0
             },
             "per_method": {},
-            "per_method_metrics": {}
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     }
 }
