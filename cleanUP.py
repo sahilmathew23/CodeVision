@@ -27,10 +27,10 @@ def delete_zip_files_in_directory(directory_path):
 if __name__ == "__main__":
     paths_to_delete = [
         '/workspaces/CodeVision1/output/ZIP/Extracted',
-        '/workspaces/CodeVision1/output/merged_output.txt',
-        '/workspaces/CodeVision1/output/enhanced_merged_output.txt',
+        '/workspaces/CodeVision1/output/',
         '/workspaces/CodeVision1/output/ClassFiles',
-        '/workspaces/CodeVision1/output/ZIP'
+        '/workspaces/CodeVision1/output/ZIP',
+        '/workspaces/CodeVision1/output/enhancedClassFiles'
     ]
     
     for path in paths_to_delete:
