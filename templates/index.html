@@ -31,7 +31,7 @@
         }
         button {
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #4834d4; /* Changed to dark blue/purple */
             color: white;
             border: none;
             border-radius: 4px;
@@ -41,7 +41,7 @@
             width: 100%;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #3c2db3; /* Darker shade for hover */
         }
         select {
             width: 100%;
@@ -149,7 +149,7 @@
             const targetType = isClass ? 'class' : 'method';
 
             refactBtn.textContent = "Processing...";
-            refactBtn.style.backgroundColor = "#FFA500";
+            refactBtn.style.backgroundColor = "#6c5ce7";
             refactBtn.disabled = true;
 
             let responseTextArea = document.getElementById("response-textarea");
@@ -169,7 +169,7 @@
             .then(data => {
                 responseTextArea.value = `Code Analysis Results:\n\n${data.message}`;
                 refactBtn.textContent = "Analysis Complete";
-                refactBtn.style.backgroundColor = "#007BFF";
+                refactBtn.style.backgroundColor = "#4834d4";
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -188,7 +188,7 @@
             let responseTextArea = document.getElementById("response-textarea");
 
             chatBtn.textContent = "Loading...";
-            chatBtn.style.backgroundColor = "#FFA500";
+            chatBtn.style.backgroundColor = "#6c5ce7";
             chatBtn.disabled = true;
 
             fetch("/get-info-raw", {
@@ -206,7 +206,7 @@
             })
             .finally(() => {
                 chatBtn.textContent = "Get Info";
-                chatBtn.style.backgroundColor = "#4CAF50";
+                chatBtn.style.backgroundColor = "#4834d4";
                 chatBtn.disabled = false;
             });
         });
