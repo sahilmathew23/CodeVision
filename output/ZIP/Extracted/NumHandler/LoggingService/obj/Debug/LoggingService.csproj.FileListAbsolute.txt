@@ -1,6 +1,0 @@
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\bin\Debug\LoggingService.dll
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\bin\Debug\LoggingService.pdb
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\obj\Debug\LoggingService.csproj.AssemblyReference.cache
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\obj\Debug\LoggingService.csproj.CoreCompileInputs.cache
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\obj\Debug\LoggingService.dll
-C:\Users\sahil\source\repos\GenAINumHandler\LoggingService\obj\Debug\LoggingService.pdb
