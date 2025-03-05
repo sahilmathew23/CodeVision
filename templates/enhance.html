@@ -27,25 +27,72 @@
             background-color: white;
         }
         .button-container {
-            margin-top: 30px;
-            margin-bottom: 30px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;           /* Increased gap for better spacing */
+            width: 100%;         /* Ensure full width */
         }
         button {
-            padding: 12px 20px;
-            background-color: #4834d4; /* Changed to dark blue/purple */
+            width: auto;
+            min-width: 100px;     /* Reduced from 120px */
+            padding: 8px 16px;    /* Reduced from 12px 24px */
+            background: linear-gradient(to bottom, #4834d4, #3c2db3);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 4px;   /* Reduced from 6px */
+            font-size: 13px;      /* Reduced from 14px */
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            margin: 12px 0;
-            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-flex;  /* Changed from flex to inline-flex */
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+            margin: 0 5px;        /* Added horizontal margin for spacing */
         }
+
         button:hover {
-            background-color: #3c2db3; /* Darker shade for hover */
+            background: linear-gradient(to bottom, #5242e0, #4834d4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button:disabled {
+            background: linear-gradient(to bottom, #3c2db3, #362599);
+            cursor: wait;
+            opacity: 0.8;
+        }
+
+        /* Add loading animation styles */
+        @keyframes button-loading {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Update loading animation size */
+        button.loading::after {
+            content: "";
+            width: 14px;          /* Reduced from 16px */
+            height: 14px;         /* Reduced from 16px */
+            margin-left: 6px;     /* Reduced from 8px */
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: button-loading 0.8s linear infinite;
         }
         #chat-container {
             margin-top: 30px;
+            text-align: center;   /* Center the button group */
         }
         input {
             padding: 12px;
@@ -85,6 +132,15 @@
             height: 60px;
             margin-top: 20px;
         }
+
+        /* Add specific styling for button group */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;            /* Space between buttons */
+            margin: 15px 0;       /* Vertical margin */
+            flex-wrap: wrap;      /* Allow wrapping on small screens */
+        }
     </style>
 </head>
 <body>
@@ -107,9 +163,11 @@
 
             <div id="chat-container">
                 <input type="text" id="chat-input" placeholder="Ask CodeVision...">
-                <button id="chat-btn">GetInfo</button>
-                <button id="clear-btn">Clear</button>
-                <button id="save-btn">Export</button>
+                <div class="button-group">
+                    <button id="chat-btn">GetInfo</button>
+                    <button id="clear-btn">Clear</button>
+                    <button id="save-btn">Export</button>
+                </div>
             </div>
         </div>
         
@@ -135,9 +193,9 @@
             .catch(error => console.error('Error loading methods:', error));
 
         document.getElementById("enhance-btn").addEventListener("click", function() {
-            let enhanceBtn = document.getElementById("enhance-btn");
+            let enhanceBtn = this;
+            enhanceBtn.classList.add('loading');
             enhanceBtn.textContent = "Processing...";
-            enhanceBtn.style.backgroundColor = "#FFA500";
             enhanceBtn.disabled = true;
 
             fetch("/enhance-process", {
@@ -175,46 +233,46 @@
                 enhanceBtn.textContent = "Enhance";
                 enhanceBtn.style.backgroundColor = "#4CAF50";
                 enhanceBtn.disabled = false;
+            })
+            .finally(() => {
+                enhanceBtn.classList.remove('loading');
+                enhanceBtn.disabled = false;
+                document.getElementById("chat-container").style.display = "block";
             });
         });
 
         document.getElementById("chat-btn").addEventListener("click", function () {
-        let chatBtn = document.getElementById("chat-btn");
-        let userInput = document.getElementById("chat-input").value;
-        let selectedModel = "{{ model }}";
-        let responseTextArea = document.getElementById("response-textarea");
+            let chatBtn = this;
+            let userInput = document.getElementById("chat-input").value;
+            let selectedModel = "{{ model }}";
+            let responseTextArea = document.getElementById("response-textarea");
 
-        if (!userInput.trim()) {
-            return;
-        }
+            if (!userInput.trim()) return;
 
-        // Disable button and show loading state
-        chatBtn.textContent = "Loading...";
-        chatBtn.style.backgroundColor = "#FFA500";
-        chatBtn.disabled = true;
+            chatBtn.classList.add('loading');
+            chatBtn.textContent = "Loading...";
+            chatBtn.disabled = true;
 
-        fetch("/get-info", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: userInput, model: selectedModel })
-        })
-        .then(response => response.json())
-        .then(data => {
-            responseTextArea.style.display = "block";
-            responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            responseTextArea.style.display = "block";
-            responseTextArea.value = "Error fetching response. Please try again.";
-        })
-        .finally(() => {
-            // Restore button state
-            chatBtn.textContent = "GetInfo";
-            chatBtn.style.backgroundColor = "#4CAF50";
-            chatBtn.disabled = false;
+            fetch("/get-info", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: userInput, model: selectedModel })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseTextArea.style.display = "block";
+                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                responseTextArea.value = "Error fetching response. Please try again.";
+            })
+            .finally(() => {
+                chatBtn.classList.remove('loading');
+                chatBtn.disabled = false;
+                chatBtn.textContent = "GetInfo";
+            });
         });
-    });
 
         document.getElementById("clear-btn").addEventListener("click", function () {
             let responseTextArea = document.getElementById("response-textarea");

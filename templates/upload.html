@@ -52,21 +52,59 @@
             margin-bottom: 10px;
         }
         button {
-            width: 100%;
-            padding: 14px;
-            background-color: #4834d4; /* Changed to dark blue/purple */
+            width: auto;          /* Changed from 100% to auto */
+            min-width: 120px;     /* Added minimum width */
+            padding: 12px 24px;   /* Changed from 14px to 12px 24px */
+            background: linear-gradient(to bottom, #4834d4, #3c2db3);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 18px;
+            border-radius: 6px;
+            font-size: 14px;      /* Reduced from 16px */
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease-in-out;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+            margin: 0 auto;       /* Added to center the button */
         }
+
         button:hover {
-            background-color: #3c2db3; /* Darker shade for hover */
+            background: linear-gradient(to bottom, #5242e0, #4834d4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
         }
+
         button:active {
-            transform: scale(0.98);
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button.loading {
+            background: linear-gradient(to bottom, #3c2db3, #362599);
+            cursor: wait;
+            opacity: 0.8;
+        }
+
+        /* Update loading button size */
+        button.loading::after {
+            content: "";
+            width: 16px;          /* Reduced from 20px */
+            height: 16px;         /* Reduced from 20px */
+            margin-left: 8px;     /* Reduced from 10px */
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: button-loading 0.8s linear infinite;
+        }
+
+        @keyframes button-loading {
+            to {
+                transform: rotate(360deg);
+            }
         }
         @media (max-width: 600px) {
             .upload-container {
@@ -122,9 +160,17 @@
 </div>
 
 <script>
+    // Existing file input handler
     document.getElementById("file").addEventListener("change", function() {
         let fileLabel = document.querySelector(".file-label");
         fileLabel.textContent = this.files.length > 0 ? this.files[0].name : "No file chosen";
+    });
+
+    // Add form submit handler
+    document.querySelector("form").addEventListener("submit", function() {
+        const button = this.querySelector("button");
+        button.classList.add("loading");
+        button.innerHTML = "Uploading...";
     });
 </script>
 </body>

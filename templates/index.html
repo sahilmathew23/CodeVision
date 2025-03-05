@@ -28,21 +28,68 @@
         }
         .button-container {
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;           /* Increased gap for better spacing */
+            width: 100%;         /* Ensure full width */
         }
         button {
-            padding: 10px 20px;
-            background-color: #4834d4; /* Changed to dark blue/purple */
+            width: auto;
+            min-width: 100px;     /* Reduced from 120px */
+            padding: 8px 16px;    /* Reduced from 12px 24px */
+            background: linear-gradient(to bottom, #4834d4, #3c2db3);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 4px;   /* Reduced from 6px */
+            font-size: 13px;      /* Reduced from 14px */
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            margin: 10px 0;
-            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-flex;  /* Changed from flex to inline-flex */
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+            margin: 0 5px;        /* Added horizontal margin for spacing */
         }
+
         button:hover {
-            background-color: #3c2db3; /* Darker shade for hover */
+            background: linear-gradient(to bottom, #5242e0, #4834d4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
         }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button:disabled {
+            background: linear-gradient(to bottom, #3c2db3, #362599);
+            cursor: wait;
+            opacity: 0.8;
+        }
+
+        /* Add loading animation styles */
+        @keyframes button-loading {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        button.loading::after {
+            content: "";
+            width: 14px;          /* Reduced from 16px */
+            height: 14px;         /* Reduced from 16px */
+            margin-left: 6px;     /* Reduced from 8px */
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: button-loading 0.8s linear infinite;
+        }
+
         select {
             width: 100%;
             padding: 8px;
@@ -77,6 +124,29 @@
             height: 60px;
             margin-top: 20px;
         }
+
+        /* Add specific styling for form buttons */
+        form {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        form button {
+            margin: 10px auto;
+            min-width: 140px;    /* Specific width for Optimize Code button */
+            text-align: center;
+            display: block;
+        }
+
+        /* Add styles for button group layout */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;            /* Space between buttons */
+            margin: 15px 0;       /* Vertical margin */
+            flex-wrap: wrap;      /* Allow wrapping on small screens */
+        }
     </style>
 </head>
 <body>
@@ -95,9 +165,11 @@
 
                 <div id="chat-container">
                     <input type="text" id="chat-input" placeholder="Ask about the project...">
-                    <button id="chat-btn">Get Info</button>
-                    <button id="clear-btn">Clear</button>
-                    <button id="save-btn">Export</button>
+                    <div class="button-group">
+                        <button id="chat-btn">Get Info</button>
+                        <button id="clear-btn">Clear</button>
+                        <button id="save-btn">Export</button>
+                    </div>
                     
                     <p style="margin: 20px 0 5px; color: #666; text-align: center;">Optimize your entire project in a click</p>
                     <form action="/enhance" method="GET">
@@ -134,9 +206,9 @@
             })
             .catch(error => console.error('Error loading methods and classes:', error));
 
-        // Modify RefactAI button handler
+        // Update the RefactAI button handler
         document.getElementById("refactai-btn").addEventListener("click", function() {
-            let refactBtn = document.getElementById("refactai-btn");
+            let refactBtn = this;
             let selected = document.getElementById("method-select").value;
             
             if (!selected) {
@@ -148,8 +220,8 @@
             const targetName = isClass ? selected.substring(6) : selected.split('.')[1];
             const targetType = isClass ? 'class' : 'method';
 
+            refactBtn.classList.add('loading');
             refactBtn.textContent = "Processing...";
-            refactBtn.style.backgroundColor = "#6c5ce7";
             refactBtn.disabled = true;
 
             let responseTextArea = document.getElementById("response-textarea");
@@ -176,19 +248,22 @@
                 responseTextArea.value = "Error during analysis. Please try again.";
             })
             .finally(() => {
+                refactBtn.classList.remove('loading');
                 refactBtn.disabled = false;
+                refactBtn.textContent = "RefactAI";
                 document.getElementById("chat-container").style.display = "block";
             });
         });
 
+        // Update the chat button handler
         document.getElementById("chat-btn").addEventListener("click", function () {
-            let chatBtn = document.getElementById("chat-btn");
+            let chatBtn = this;
             let userInput = document.getElementById("chat-input").value;
             let selectedModel = "{{ model }}";
             let responseTextArea = document.getElementById("response-textarea");
 
+            chatBtn.classList.add('loading');
             chatBtn.textContent = "Loading...";
-            chatBtn.style.backgroundColor = "#6c5ce7";
             chatBtn.disabled = true;
 
             fetch("/get-info-raw", {
@@ -205,9 +280,9 @@
                 console.error("Error:", error);
             })
             .finally(() => {
-                chatBtn.textContent = "Get Info";
-                chatBtn.style.backgroundColor = "#4834d4";
+                chatBtn.classList.remove('loading');
                 chatBtn.disabled = false;
+                chatBtn.textContent = "Get Info";
             });
         });
 
