@@ -38,6 +38,7 @@ def upload_file():
             directory_to_scan = f"{filename}"
             output_file = "/workspaces/CodeVision1/output/merged_output.txt"
             subprocess.run(["python", "scanAndMerge.py", directory_to_scan, output_file], check=True)
+            subprocess.run(["python", "ExtractZIP.py"], check=True)
             return redirect(url_for('index_page', filename=file.filename, model=model))
         else:
             return jsonify({"message": "Invalid file type. Only .zip files are allowed."}), 400
@@ -118,4 +119,4 @@ def enhance_process():
         return jsonify({"message": f"Error in running pipeline: {e}"}), 500
 
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    app.run(port=5002, debug=True)

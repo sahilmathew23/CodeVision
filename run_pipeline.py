@@ -45,10 +45,10 @@ def main():
     print()
     
     #this will extract .zip file that was uploaded in ZIP/Extracted folder
-    print("Starting ExtractZIP.py...\n")
-    run_script("ExtractZIP.py")
-    print()
-    print()
+    #print("Starting ExtractZIP.py...\n")
+    #run_script("ExtractZIP.py")
+    #print()
+    #print()
     
     #this will replace ClassFiles in the Extracted Folder & ZIP it
     print("Starting replaceEnhancedCsAndZIP.py...\n")
