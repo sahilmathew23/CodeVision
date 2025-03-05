@@ -78,12 +78,15 @@
             }
         }
         .header-content {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;  /* Reduced gap between elements */
             margin-bottom: 20px;
         }
         .logo {
-            height: 40px;
-            margin-right: 10px;
+            height: 50px;  /* Increased from 40px to 50px */
+            margin-left: 5px;  /* Reduced from 10px to 5px */
         }
         .page-icon {
             height: 60px;
@@ -95,10 +98,9 @@
 
 <div class="upload-container">
     <div class="header-content">
+        <h2 style="margin: 0;">Welcome to CodeVision</h2>
         <img src="/static/images/logo.png" alt="CodeVision Logo" class="logo">
     </div>
-    <br>
-    <h2>Welcome to CodeVision</h2>
     <br>
     <h3>Upload your Project</h3>
     <br>
