@@ -132,7 +132,7 @@ def enhance(model_name):
             
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(content)
-            print(f"Saved enhanced file: {filename}")
+            print(f"Saved enhanced file: {output_path}")
     else:
         print("Project enhancement failed.")
 

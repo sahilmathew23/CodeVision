@@ -68,7 +68,7 @@ def zip_directory(directory, zip_path):
 
 if __name__ == "__main__":
     # Define paths
-    src_folder = "/workspaces/CodeVision1/output/enhancedFiles"
+    src_folder = "/workspaces/CodeVision1/output/ClassFiles"
     dest_folder = "/workspaces/CodeVision1/output/ZIP/Extracted"
     zip_path = "/workspaces/CodeVision1/output/ZIP/Extracted_files.zip"
     
