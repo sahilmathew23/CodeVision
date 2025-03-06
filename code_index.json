@@ -2,13 +2,26 @@
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/Program.cs": {
         "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/DataProcessorMain/Program.cs",
         "classes": [
-            "Program"
+            "Program",
+            "now",
+            "handles",
+            "now"
         ],
         "methods": [
             "Main",
+            "Logger",
             "DataHandler",
             "UserManager",
-            "Logger"
+            "abstractions",
+            "implementations",
+            "possible",
+            "stream",
+            "logging",
+            "interpolation",
+            "file",
+            "dependencies",
+            "operations",
+            "system"
         ],
         "dependencies": [
             "System",
@@ -23,7 +36,15 @@
             ],
             [
                 "Main",
+                "Logger"
+            ],
+            [
+                "Main",
                 "DataHandler"
+            ],
+            [
+                "Main",
+                "UserManager"
             ],
             [
                 "Main",
@@ -31,15 +52,7 @@
             ],
             [
                 "Main",
-                "InfiniteLoop"
-            ],
-            [
-                "Main",
                 "HardCodedValues"
-            ],
-            [
-                "Main",
-                "UnusedMethod"
             ],
             [
                 "Main",
@@ -51,23 +64,87 @@
             ],
             [
                 "Main",
-                "UserManager"
-            ],
-            [
-                "Main",
                 "ManageUsers"
             ],
             [
                 "Main",
-                "Logger"
+                "LogMessage"
             ],
             [
-                "Main",
+                "Logger",
+                "ProcessData"
+            ],
+            [
+                "Logger",
+                "HardCodedValues"
+            ],
+            [
+                "Logger",
+                "InefficientStringConcatenation"
+            ],
+            [
+                "Logger",
+                "ExceptionSwallowing"
+            ],
+            [
+                "Logger",
+                "ManageUsers"
+            ],
+            [
+                "Logger",
+                "LogMessage"
+            ],
+            [
+                "DataHandler",
+                "ProcessData"
+            ],
+            [
+                "DataHandler",
+                "HardCodedValues"
+            ],
+            [
+                "DataHandler",
+                "InefficientStringConcatenation"
+            ],
+            [
+                "DataHandler",
+                "ExceptionSwallowing"
+            ],
+            [
+                "DataHandler",
+                "ManageUsers"
+            ],
+            [
+                "DataHandler",
+                "LogMessage"
+            ],
+            [
+                "UserManager",
+                "ProcessData"
+            ],
+            [
+                "UserManager",
+                "HardCodedValues"
+            ],
+            [
+                "UserManager",
+                "InefficientStringConcatenation"
+            ],
+            [
+                "UserManager",
+                "ExceptionSwallowing"
+            ],
+            [
+                "UserManager",
+                "ManageUsers"
+            ],
+            [
+                "UserManager",
                 "LogMessage"
             ]
         ],
         "cyclomatic_complexity": {
-            "overall": 1,
+            "overall": 3,
             "overall_metrics": {
                 "if_statements": 0,
                 "else_statements": 0,
@@ -78,29 +155,12 @@
                 "for_loops": 0,
                 "do_while_loops": 0,
                 "foreach_loops": 0,
-                "try_catch_blocks": 0,
+                "try_catch_blocks": 2,
                 "conditional_ops": 0,
                 "logical_ops": 0
             },
-            "per_method": {
-                "Main": 1
-            },
-            "per_method_metrics": {
-                "Main": {
-                    "if_statements": 0,
-                    "else_statements": 0,
-                    "elif_statements": 0,
-                    "switch_statements": 0,
-                    "case_branches": 0,
-                    "while_loops": 0,
-                    "for_loops": 0,
-                    "do_while_loops": 0,
-                    "foreach_loops": 0,
-                    "try_catch_blocks": 0,
-                    "conditional_ops": 0,
-                    "logical_ops": 0
-                }
-            },
+            "per_method": {},
+            "per_method_metrics": {},
             "per_class": {},
             "per_class_metrics": {}
         }
@@ -195,11 +255,9 @@
             "per_class_metrics": {}
         }
     },
-    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs": {
-        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs",
-        "classes": [
-            "UserManager"
-        ],
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/IUserManager.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/IUserManager.cs",
+        "classes": [],
         "methods": [
             "ManageUsers"
         ],
@@ -221,8 +279,42 @@
                 "conditional_ops": 0,
                 "logical_ops": 0
             },
+            "per_method": {},
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/UserManager/UserManager.cs",
+        "classes": [
+            "UserManager"
+        ],
+        "methods": [
+            "ManageUsers"
+        ],
+        "dependencies": [
+            "System"
+        ],
+        "method_calls": [],
+        "cyclomatic_complexity": {
+            "overall": 2,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 1,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
             "per_method": {
-                "ManageUsers": 1
+                "ManageUsers": 2
             },
             "per_method_metrics": {
                 "ManageUsers": {
@@ -235,7 +327,7 @@
                     "for_loops": 0,
                     "do_while_loops": 0,
                     "foreach_loops": 0,
-                    "try_catch_blocks": 0,
+                    "try_catch_blocks": 1,
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }
@@ -313,27 +405,49 @@
             "Logger"
         ],
         "methods": [
-            "LogMessage"
+            "LogMessage",
+            "StreamWriter"
         ],
-        "dependencies": [],
+        "dependencies": [
+            "System",
+            "System.IO"
+        ],
         "method_calls": [
             [
                 "LogMessage",
-                "StreamWriter"
-            ],
-            [
-                "LogMessage",
-                "WriteLine"
-            ],
-            [
-                "LogMessage",
-                "WriteLine"
-            ],
-            [
-                "LogMessage",
-                "Close"
+                "using"
             ]
         ],
+        "cyclomatic_complexity": {
+            "overall": 2,
+            "overall_metrics": {
+                "if_statements": 0,
+                "else_statements": 0,
+                "elif_statements": 0,
+                "switch_statements": 0,
+                "case_branches": 0,
+                "while_loops": 0,
+                "for_loops": 0,
+                "do_while_loops": 0,
+                "foreach_loops": 0,
+                "try_catch_blocks": 1,
+                "conditional_ops": 0,
+                "logical_ops": 0
+            },
+            "per_method": {},
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
+        }
+    },
+    "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/ILogger.cs": {
+        "file": "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/ILogger.cs",
+        "classes": [],
+        "methods": [
+            "LogMessage"
+        ],
+        "dependencies": [],
+        "method_calls": [],
         "cyclomatic_complexity": {
             "overall": 1,
             "overall_metrics": {
@@ -350,37 +464,10 @@
                 "conditional_ops": 0,
                 "logical_ops": 0
             },
-            "per_method": {
-                "LogMessage": 1
-            },
-            "per_method_metrics": {
-                "LogMessage": {
-                    "if_statements": 0,
-                    "else_statements": 0,
-                    "elif_statements": 0,
-                    "switch_statements": 0,
-                    "case_branches": 0,
-                    "while_loops": 0,
-                    "for_loops": 0,
-                    "do_while_loops": 0,
-                    "foreach_loops": 0,
-                    "try_catch_blocks": 0,
-                    "conditional_ops": 0,
-                    "logical_ops": 0
-                }
-            },
-            "per_class": {
-                "Logger": 1.0
-            },
-            "per_class_metrics": {
-                "Logger": {
-                    "properties": 0,
-                    "methods": 1,
-                    "fields": 0,
-                    "nested_classes": 0,
-                    "interfaces_implemented": 0
-                }
-            }
+            "per_method": {},
+            "per_method_metrics": {},
+            "per_class": {},
+            "per_class_metrics": {}
         }
     },
     "/workspaces/CodeVision1/output/ZIP/Extracted/NumHandler/LoggingService/Properties/AssemblyInfo.cs": {
@@ -452,35 +539,42 @@
             "DataHandler"
         ],
         "methods": [
+            "DataHandler",
+            "ArgumentNullException",
             "ProcessData",
-            "InfiniteLoop",
             "HardCodedValues",
-            "UnusedMethod",
             "InefficientStringConcatenation",
+            "StringBuilder",
             "ExceptionSwallowing"
         ],
         "dependencies": [
-            "System"
+            "System",
+            "System.Text",
+            "LoggingService"
         ],
         "method_calls": [
             [
+                "DataHandler",
+                "DataHandler"
+            ],
+            [
+                "DataHandler",
+                "ArgumentNullException"
+            ],
+            [
+                "ArgumentNullException",
+                "WriteLine"
+            ],
+            [
+                "ArgumentNullException",
+                "WriteLine"
+            ],
+            [
                 "ProcessData",
                 "WriteLine"
             ],
             [
                 "ProcessData",
-                "for"
-            ],
-            [
-                "ProcessData",
-                "WriteLine"
-            ],
-            [
-                "InfiniteLoop",
-                "while"
-            ],
-            [
-                "InfiniteLoop",
                 "WriteLine"
             ],
             [
@@ -489,34 +583,58 @@
             ],
             [
                 "InefficientStringConcatenation",
+                "StringBuilder"
+            ],
+            [
+                "InefficientStringConcatenation",
                 "for"
+            ],
+            [
+                "InefficientStringConcatenation",
+                "Append"
+            ],
+            [
+                "StringBuilder",
+                "Append"
             ]
         ],
         "cyclomatic_complexity": {
-            "overall": 5,
+            "overall": 4,
             "overall_metrics": {
                 "if_statements": 0,
                 "else_statements": 0,
                 "elif_statements": 0,
                 "switch_statements": 0,
                 "case_branches": 0,
-                "while_loops": 1,
-                "for_loops": 2,
+                "while_loops": 0,
+                "for_loops": 1,
                 "do_while_loops": 0,
                 "foreach_loops": 0,
-                "try_catch_blocks": 1,
+                "try_catch_blocks": 2,
                 "conditional_ops": 0,
                 "logical_ops": 0
             },
             "per_method": {
-                "ProcessData": 2,
-                "InfiniteLoop": 2,
+                "DataHandler": 1,
+                "ProcessData": 1,
                 "HardCodedValues": 1,
-                "UnusedMethod": 1,
-                "InefficientStringConcatenation": 2,
-                "ExceptionSwallowing": 2
+                "InefficientStringConcatenation": 2
             },
             "per_method_metrics": {
+                "DataHandler": {
+                    "if_statements": 0,
+                    "else_statements": 0,
+                    "elif_statements": 0,
+                    "switch_statements": 0,
+                    "case_branches": 0,
+                    "while_loops": 0,
+                    "for_loops": 0,
+                    "do_while_loops": 0,
+                    "foreach_loops": 0,
+                    "try_catch_blocks": 0,
+                    "conditional_ops": 0,
+                    "logical_ops": 0
+                },
                 "ProcessData": {
                     "if_statements": 0,
                     "else_statements": 0,
@@ -524,20 +642,6 @@
                     "switch_statements": 0,
                     "case_branches": 0,
                     "while_loops": 0,
-                    "for_loops": 1,
-                    "do_while_loops": 0,
-                    "foreach_loops": 0,
-                    "try_catch_blocks": 0,
-                    "conditional_ops": 0,
-                    "logical_ops": 0
-                },
-                "InfiniteLoop": {
-                    "if_statements": 0,
-                    "else_statements": 0,
-                    "elif_statements": 0,
-                    "switch_statements": 0,
-                    "case_branches": 0,
-                    "while_loops": 1,
                     "for_loops": 0,
                     "do_while_loops": 0,
                     "foreach_loops": 0,
@@ -546,20 +650,6 @@
                     "logical_ops": 0
                 },
                 "HardCodedValues": {
-                    "if_statements": 0,
-                    "else_statements": 0,
-                    "elif_statements": 0,
-                    "switch_statements": 0,
-                    "case_branches": 0,
-                    "while_loops": 0,
-                    "for_loops": 0,
-                    "do_while_loops": 0,
-                    "foreach_loops": 0,
-                    "try_catch_blocks": 0,
-                    "conditional_ops": 0,
-                    "logical_ops": 0
-                },
-                "UnusedMethod": {
                     "if_statements": 0,
                     "else_statements": 0,
                     "elif_statements": 0,
@@ -584,20 +674,6 @@
                     "do_while_loops": 0,
                     "foreach_loops": 0,
                     "try_catch_blocks": 0,
-                    "conditional_ops": 0,
-                    "logical_ops": 0
-                },
-                "ExceptionSwallowing": {
-                    "if_statements": 0,
-                    "else_statements": 0,
-                    "elif_statements": 0,
-                    "switch_statements": 0,
-                    "case_branches": 0,
-                    "while_loops": 0,
-                    "for_loops": 0,
-                    "do_while_loops": 0,
-                    "foreach_loops": 0,
-                    "try_catch_blocks": 1,
                     "conditional_ops": 0,
                     "logical_ops": 0
                 }

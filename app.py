@@ -5,7 +5,7 @@ import subprocess
 app = Flask(__name__)
 
 UPLOAD_FOLDER = '/workspaces/CodeVision1/input'
-EXTRACTED_FOLDER = '/workspaces/CodeVision1/output/ZIP/Extracted_files'
+EXTRACTED_FOLDER = '/workspaces/CodeVision1/output/ZIP'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(EXTRACTED_FOLDER, exist_ok=True)
