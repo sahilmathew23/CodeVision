@@ -80,63 +80,62 @@ def extract_files_from_merged_output(file_path):
     return extracted_files
 
 def enhance(model_name):
-    """Enhance each extracted file from merged_output.txt."""
+    """Enhance the entire project content from merged_output.txt."""
     input_file = "output/merged_output.txt"
     prompt_file = "input/prompt.txt"
     
-    print(f"Enhancing code using model: {model_name}")
+    print(f"Enhancing project using model: {model_name}")
     
-    if not os.path.exists(input_file):
-        print("Error: Input file not found.")
-        return
-    if not os.path.exists(prompt_file):
-        print("Error: Prompt file not found.")
+    if not os.path.exists(input_file) or not os.path.exists(prompt_file):
+        print("Error: Required files not found.")
         return
 
     # Read prompt template
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt_template = file.read()
 
-    extracted_files = extract_files_from_merged_output(input_file)
-    output_dir = "output/enhancedClassFiles"
-    os.makedirs(output_dir, exist_ok=True)
-    with open("output/merged_output.txt", "r", encoding="utf-8") as file:
-        content = file.read()
-    for file_name, file_content in extracted_files.items():
-        prompt = prompt_template.format(file_name=file_name, file_content_str=content)
+    # Read entire project content
+    with open(input_file, "r", encoding="utf-8") as file:
+        project_content = file.read()
 
-        if model_name == "gpt-4-turbo":
-            output = call_openai_api(prompt)
-        elif model_name == "gemini-2.0-flash":
-            output = call_gemini_api(prompt)
-        else:
-            print(f"Error: Unsupported model {model_name}")
-            return
+    # Prepare prompt with entire project content
+    prompt = prompt_template.format(project_content=project_content)
 
-        if output:
-            output_file = os.path.join(output_dir, f"enhanced_{file_name}")
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(output)
-            print(f"Enhanced version of {file_name} saved to {output_file}\n")
-        else:
-            print(f"Enhancement failed for {file_name}.")
+    # Call appropriate API
+    if model_name == "gpt-4-turbo":
+        output = call_openai_api(prompt)
+    elif model_name == "gemini-2.0-flash":
+        output = call_gemini_api(prompt)
+    else:
+        print(f"Error: Unsupported model {model_name}")
+        return
 
-    input_dir = "/workspaces/CodeVision1/output/enhancedClassFiles"
-    output_file = "/workspaces/CodeVision1/output/enhanced_merged_output.txt"
+    if output:
+        # Save enhanced project
+        output_file = "output/enhanced_project.txt"
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(output)
+        print(f"Enhanced project saved to {output_file}")
 
-    separator = "\n" + "=" * 80 + "\n"  # A clear separator line
+        # Extract and save individual files
+        output_dir = "output/enhancedFiles"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Split the output into individual files
+        file_sections = re.split(r"===== FILE: (.*?) =====\n", output)
+        for i in range(1, len(file_sections), 2):
+            filename = file_sections[i].strip()
+            content = file_sections[i+1].strip().replace("===== END FILE =====", "").strip()
+            
+            output_path = os.path.join(output_dir, filename)
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            print(f"Saved enhanced file: {filename}")
+    else:
+        print("Project enhancement failed.")
 
-    with open(output_file, "w", encoding="utf-8") as outfile:
-        for filename in sorted(os.listdir(input_dir)):  # Sorting for order
-            file_path = os.path.join(input_dir, filename)
-            if os.path.isfile(file_path):  # Ensure it's a file
-                with open(file_path, "r", encoding="utf-8") as infile:
-                    outfile.write(f"\nFile: {filename}\n")  # File name header
-                    outfile.write(separator)  # Separator line
-                    outfile.write(infile.read().strip() + "\n")  # File content
-                    outfile.write(separator)  # Another separator for next file
-
-    print(f"All files merged into {output_file}")
 # Run the enhancement process
 if __name__ == "__main__":
     if len(sys.argv) < 2:

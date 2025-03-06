@@ -78,7 +78,7 @@ def process_query(user_query, model, project_type):
     if project_type == "raw":
         class_content_path = "/workspaces/CodeVision1/output/merged_output.txt"
     elif project_type == "enhanced":
-        class_content_path = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt"
+        class_content_path = "/workspaces/CodeVision1/output/enhanced_project.txt"
 
     # Read prompt template
     prompt_template = read_file(prompt_template_path)

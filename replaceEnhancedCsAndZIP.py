@@ -2,78 +2,79 @@ import os
 import shutil
 import zipfile
 
-def find_file_in_directory(file_name, search_directory):
-    """Recursively search for a file in the given directory."""
-    for root, _, files in os.walk(search_directory):
-        if file_name in files:
-            return os.path.join(root, file_name)
+def find_interface_implementation_pair(file_name, src_folder):
+    """Find interface file for a given implementation file."""
+    if not file_name.startswith('I') and file_name.endswith('.cs'):
+        interface_name = 'I' + file_name
+        interface_path = os.path.join(src_folder, interface_name)
+        if os.path.exists(interface_path):
+            return interface_path
     return None
 
-def replace_modified_files(src_folder, dest_folder):
-    if not os.path.exists(src_folder) or not os.path.exists(dest_folder):
-        os.makedirs(src_folder)
-        os.makedirs(dest_folder)
-        return
-    
-    for file_name in os.listdir(src_folder):
-        if file_name.endswith(".cs"):  # Only consider .cs files
-            src_file = os.path.join(src_folder, file_name)
-            dest_file = find_file_in_directory(file_name, dest_folder)
-            
-            if dest_file:  # Replace only if file exists in destination
-                shutil.copy2(src_file, dest_file)
-                #print(f"Replaced: {dest_file} with {src_file}")
-            else:
-                print(f"Skipped (not found in destination): {file_name}")
+def find_files_in_directory(file_name, search_directory):
+    """Recursively search for all instances of a file in the given directory and subdirectories."""
+    matching_files = []
+    for root, _, files in os.walk(search_directory):
+        if file_name in files:
+            matching_files.append(os.path.join(root, file_name))
+    return matching_files
 
-def zip_all_files_in_directory(directory, zip_name):
-    """Zip all files under the given directory."""
-    with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(directory):
+def replace_modified_files(src_folder, dest_folder):
+    """Replace files from source folder to matching files in destination folder and its subdirectories."""
+    if not os.path.exists(src_folder) or not os.path.exists(dest_folder):
+        print("Source or destination folder does not exist")
+        return False
+    
+    replaced_files = 0
+    for file_name in os.listdir(src_folder):
+        if file_name.endswith(".cs"):
+            # Skip interface files as they'll be handled with their implementations
+            if file_name.startswith('I'):
+                continue
+                
+            src_file = os.path.join(src_folder, file_name)
+            matching_files = find_files_in_directory(file_name, dest_folder)
+            
+            # Find interface file if it exists
+            interface_file = find_interface_implementation_pair(file_name, src_folder)
+            
+            if matching_files:
+                for dest_file in matching_files:
+                    # Copy implementation file
+                    shutil.copy2(src_file, dest_file)
+                    print(f"Replaced: {dest_file}")
+                    replaced_files += 1
+                    
+                    # Copy interface file if it exists
+                    if interface_file:
+                        dest_interface = os.path.join(os.path.dirname(dest_file), 'I' + file_name)
+                        shutil.copy2(interface_file, dest_interface)
+                        print(f"Copied interface: {dest_interface}")
+                        replaced_files += 1
+            else:
+                print(f"No matching files found for: {file_name}")
+    
+    return replaced_files > 0
+
+def zip_directory(directory, zip_path):
+    """Create a zip file from a directory, preserving the directory structure."""
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(directory):
             for file in files:
                 file_path = os.path.join(root, file)
-                zipf.write(file_path, os.path.relpath(file_path, directory))
-    print(f"Files successfully zipped into {zip_name}")
-
-def move_file(src, dest):
-    try:
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
-        shutil.move(src, dest)
-        print(f"File moved successfully to {dest}")
-    except Exception as e:
-        print(f"Error: {e}")
-
-def move_files(src, dest):
-    try:
-        os.makedirs(dest, exist_ok=True)
-        for file_name in os.listdir(src):
-            full_file_name = os.path.join(src, file_name)
-            if os.path.isfile(full_file_name):
-                shutil.move(full_file_name, os.path.join(dest, file_name))
-        print(f"All files moved successfully to {dest}")
-    except Exception as e:
-        print(f"Error: {e}")
+                arcname = os.path.relpath(file_path, directory)
+                zipf.write(file_path, arcname)
+    print(f"Created zip file: {zip_path}")
 
 if __name__ == "__main__":
-    class_files_path = "/workspaces/CodeVision1/output/ClassFiles"
-    extracted_files_path = "/workspaces/CodeVision1/output/ZIP/Extracted"
+    # Define paths
+    src_folder = "/workspaces/CodeVision1/output/enhancedFiles"
+    dest_folder = "/workspaces/CodeVision1/output/ZIP/Extracted"
+    zip_path = "/workspaces/CodeVision1/output/ZIP/Extracted_files.zip"
     
     # Replace files
-    replace_modified_files(class_files_path, extracted_files_path)
-    
-    #Move merged_output.txt, enhancedClasses to be zipped
-    source_fileMergedOutput = "/workspaces/CodeVision1/output/merged_output.txt"
-    source_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/enhanced_merged_output.txt"
-    
-    destination_fileMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/merged_output.txt" 
-    destination_fileEnhancedMergedOutput = "/workspaces/CodeVision1/output/ZIP/Extracted/enhanced_merged_output.txt" 
-    
-    source_dir = "/workspaces/CodeVision1/output/enhancedClassFiles"
-    destination_dir = "/workspaces/CodeVision1/output/ZIP/Extracted/DetailedEnhancementInfo"
-    move_file(source_fileMergedOutput, destination_fileMergedOutput)
-    move_file(source_fileEnhancedMergedOutput, destination_fileEnhancedMergedOutput)
-    move_files(source_dir, destination_dir)
-
-    # Zip the extracted files after replacing 
-    zip_file_name = "/workspaces/CodeVision1/output/ZIP/Extracted_files.zip"
-    zip_all_files_in_directory(extracted_files_path, zip_file_name)
+    if replace_modified_files(src_folder, dest_folder):
+        # Create zip file
+        zip_directory(dest_folder, zip_path)
+    else:
+        print("No files were replaced. Zip creation skipped.")

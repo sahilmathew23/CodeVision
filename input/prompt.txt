@@ -1,17 +1,23 @@
-You are provided with the codebase of a .NET project. Below is the content of {file_name}:
+You are provided with the codebase of a .NET project. Below is the complete project content:
 
-{file_content_str}
+{project_content}
 
 Context and Enhancement Goals:
-Enhance this file while considering its role in the overall project:
+Analyze and enhance the entire project considering:
 
-- **Refactor using SOLID principles**.
-- **Ensure modularity and reusability**.
-- **Improve performance and scalability**.
-- **Strengthen error handling and logging**.
-- **Apply relevant security best practices**.
-- **Maintain .NET coding conventions**.
+- **SOLID principles and Clean Architecture**
+- **Modularity, reusability, and maintainability**
+- **Performance optimization and scalability**
+- **Comprehensive error handling and logging**
+- **Security best practices**
+- **Consistent .NET coding conventions**
 
 Provide:
-1. The enhanced version of `{file_name}`.
-2. Explanation of modifications.
+1. The enhanced version of the entire project, maintaining the original file structure, create interfaces in new files,
+2. Brief explanation of major architectural changes and improvements
+3. Each file should be clearly separated using the format:
+===== FILE: [filename] =====
+[file content]
+===== END FILE =====
+
+Focus on maintaining project cohesion while improving each component.
