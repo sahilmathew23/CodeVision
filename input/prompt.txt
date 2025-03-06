@@ -13,7 +13,7 @@ Analyze and enhance the entire project considering:
 - **Consistent .NET coding conventions**
 
 Provide:
-1. The enhanced version of the entire project, maintaining the original file structure, create interfaces in new files,
+1. The enhanced version of the entire project, maintaining the original file structure, create interfaces in new files, dont create any other files than interfaces
 2. Brief explanation of major architectural changes and improvements
 3. Each file should be clearly separated using the format:
 ===== FILE: [filename] =====

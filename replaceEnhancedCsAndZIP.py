@@ -66,6 +66,32 @@ def zip_directory(directory, zip_path):
                 zipf.write(file_path, arcname)
     print(f"Created zip file: {zip_path}")
 
+def print_csproj_files(directory):
+    """Print all .csproj files found in the given directory and its subdirectories."""
+    found = False
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.csproj'):
+                file_path = os.path.join(root, file)
+                print(f"Found .csproj file: {file_path}")
+                
+                # Read and check OutputType
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        if '<OutputType>Exe</OutputType>' in content:
+                            print(f"  Output Type: Executable")
+                        elif '<OutputType>Library</OutputType>' in content:
+                            print(f"  Output Type: Library")
+                        else:
+                            print(f"  Output Type: Not specified")
+                except Exception as e:
+                    print(f"  Error reading file: {str(e)}")
+                
+                found = True
+    if not found:
+        print("No .csproj files found in the directory.")
+
 if __name__ == "__main__":
     # Define paths
     src_folder = "/workspaces/CodeVision1/output/ClassFiles"
@@ -74,6 +100,10 @@ if __name__ == "__main__":
     
     # Replace files
     if replace_modified_files(src_folder, dest_folder):
+        # Print .csproj files before zipping
+        print("\nChecking for .csproj files:")
+        print_csproj_files(dest_folder)
+        
         # Create zip file
         zip_directory(dest_folder, zip_path)
     else:
