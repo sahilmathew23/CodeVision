@@ -118,7 +118,7 @@ def enhance(model_name):
         print(f"Enhanced project saved to {output_file}")
 
         # Extract and save individual files
-        output_dir = "output/enhancedFiles"
+        output_dir = "/workspaces/CodeVision1/output/enhancedFiles"
         os.makedirs(output_dir, exist_ok=True)
         
         # Split the output into individual files
