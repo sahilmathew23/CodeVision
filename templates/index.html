@@ -112,14 +112,18 @@
 
         /* Update chat input style to match */
         #chat-input {
-            width: calc(100% - 16px);  /* Match other inputs */
-            padding: 8px;              /* Match other inputs padding */
+            width: calc(100% - 16px);
+            min-height: 50px;
+            max-height: 150px;
+            padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             margin: 10px 0;
             font-size: 13px;
+            resize: both;
+            overflow: auto;
+            font-family: inherit;
         }
-
         #response-textarea {
             width: 100%;
             height: calc(100vh - 60px);
@@ -186,9 +190,9 @@
                     <option value="">Select a class/method...</option>
                 </select>
                 <button id="refactai-btn">RefactAI</button>
-
+                
                 <div id="chat-container">
-                    <input type="text" id="chat-input" placeholder="Ask about the project...">
+                    <textarea id="chat-input" placeholder="Ask about the project..."></textarea>
                     <div class="button-group">
                         <button id="chat-btn">Get Info</button>
                         <button id="clear-btn">Clear</button>
@@ -204,13 +208,11 @@
                 </div>
             </div>
         </div>
-        
         <div class="right-panel">
             <div id="response-content" style="height: calc(100vh - 60px); overflow-y: auto; padding: 10px;"></div>
             <textarea id="response-textarea" style="display: none;" readonly></textarea>
         </div>
     </div>
-
     <script>
         // Add method and class list loading code at the beginning
         fetch('/get-methods')
@@ -235,7 +237,7 @@
         document.getElementById("refactai-btn").addEventListener("click", function() {
             let refactBtn = this;
             let selected = document.getElementById("method-select").value;
-            
+
             if (!selected) {
                 alert("Please select a class or method to analyze");
                 return;

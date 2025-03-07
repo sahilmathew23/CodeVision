@@ -141,6 +141,19 @@
             margin: 15px 0;       /* Vertical margin */
             flex-wrap: wrap;      /* Allow wrapping on small screens */
         }
+        #chat-input {
+            width: calc(100% - 26px);
+            min-height: 50px;
+            max-height: 150px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            resize: both;
+            overflow: auto;
+            font-family: inherit;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -163,7 +176,7 @@
             </div>
 
             <div id="chat-container">
-                <input type="text" id="chat-input" placeholder="Ask CodeVision...">
+                <textarea id="chat-input" placeholder="Ask about the project......"></textarea>
                 <div class="button-group">
                     <button id="chat-btn">GetInfo</button>
                     <button id="clear-btn">Clear</button>
