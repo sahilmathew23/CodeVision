@@ -142,6 +142,7 @@
             flex-wrap: wrap;      /* Allow wrapping on small screens */
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <div class="page-container">
@@ -172,7 +173,8 @@
         </div>
         
         <div class="right-panel">
-            <textarea id="response-textarea" readonly></textarea>
+            <div id="response-content" style="height: calc(100vh - 60px); overflow-y: auto; padding: 10px;"></div>
+            <textarea id="response-textarea" style="display: none;" readonly></textarea>
         </div>
     </div>
 
@@ -241,6 +243,13 @@
             });
         });
 
+        function renderMarkdown(text) {
+            const parsedContent = marked.parse(text);
+            document.getElementById('response-content').innerHTML = parsedContent;
+            document.getElementById('response-textarea').value = text;
+        }
+
+        // Update the chat button event listener
         document.getElementById("chat-btn").addEventListener("click", function () {
             let chatBtn = this;
             let userInput = document.getElementById("chat-input").value;
@@ -260,8 +269,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                responseTextArea.style.display = "block";
-                responseTextArea.value = `Selected model: ${selectedModel}\n\n${data.message}`;
+                responseTextArea.style.display = "none";
+                renderMarkdown(`Selected model: ${selectedModel}\n\n${data.message}`);
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -277,10 +286,11 @@
         document.getElementById("clear-btn").addEventListener("click", function () {
             let responseTextArea = document.getElementById("response-textarea");
             let chatInput = document.getElementById("chat-input");
+            let responseContent = document.getElementById("response-content");
 
-            responseTextArea.value = ""; // Clear the textarea content
-            responseTextArea.style.display = "none"; // Hide the textarea
-            chatInput.value = ""; // Clear the chat input field
+            responseTextArea.value = "";
+            responseContent.innerHTML = "";
+            chatInput.value = "";
         });
 
         document.getElementById("save-btn").addEventListener("click", function () {
@@ -291,7 +301,7 @@
             let blob = new Blob([combinedText], { type: "text/plain" });
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
-            a.download = "chat_output.txt";
+            a.download = "chat_output.md";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
