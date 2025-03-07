@@ -121,18 +121,47 @@ def enhance(model_name):
         output_dir = "/workspaces/CodeVision1/output/enhancedFiles"
         os.makedirs(output_dir, exist_ok=True)
         
-        # Split the output into individual files
-        file_sections = re.split(r"===== FILE: (.*?) =====\n", output)
-        for i in range(1, len(file_sections), 2):
-            filename = file_sections[i].strip()
-            content = file_sections[i+1].strip().replace("===== END FILE =====", "").strip()
+        created_files = []
+        
+        # Add debug print to see the raw output
+        print("\nDebug - Raw output:")
+        print(output[:500])  # Print first 500 chars
+        
+        # Split the output into individual files with improved regex
+        pattern = r'===== FILE: ([^\n]+?) =====\n```[^\n]*\n(.*?)\n```(?:\n===== END FILE =====)?'
+        matches = re.finditer(pattern, output, re.DOTALL)
+        
+        for match in matches:
+            filename = match.group(1).strip()
+            content = match.group(2).strip()
             
-            output_path = os.path.join(output_dir, filename)
+            print(f"\nDebug - Processing file: {filename}")
+            print(f"Content length: {len(content)} characters")
+            
+            # Remove tmp path prefix if present
+            filename = re.sub(r'^/tmp/[^/]+/', '', filename)
+            
+            # Ensure the filename is sanitized and remove any invalid characters
+            safe_filename = os.path.normpath(filename).lstrip(os.sep)
+            output_path = os.path.join(output_dir, safe_filename)
+            
+            print(f"Debug - Writing to: {output_path}")
+            
+            # Ensure directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            created_files.append(output_path)
             
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            print(f"Saved enhanced file: {output_path}")
+            try:
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print(f"Successfully saved: {output_path}")
+            except Exception as e:
+                print(f"Error saving file {output_path}: {e}")
+        
+        # Print summary of created files
+        print("\nSummary of created files:")
+        for file_path in created_files:
+            print(f"- {file_path}")
     else:
         print("Project enhancement failed.")
 

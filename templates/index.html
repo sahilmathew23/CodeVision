@@ -164,6 +164,12 @@
             margin: 15px 0;       /* Vertical margin */
             flex-wrap: wrap;      /* Allow wrapping on small screens */
         }
+
+        #response-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -259,7 +265,8 @@
             .then(response => response.json())
             .then(data => {
                 responseTextArea.style.display = "none";
-                renderMarkdown(`Code Analysis Results:\n\n${data.message}`);
+                const imgPath = `/static/images/dependencies_graph_${targetName}.png`;
+                renderMarkdown(`Code Analysis Results:\n\n![Dependency Graph](${imgPath})\n\n${data.message}`);
                 refactBtn.textContent = "Analysis Complete";
                 refactBtn.style.backgroundColor = "#4834d4";
             })
@@ -316,7 +323,6 @@
             let userInput = document.getElementById("chat-input").value;
             let responseText = document.getElementById("response-textarea").value;
             let combinedText = `User Input: ${userInput}\n\nResponse:\n${responseText}`;
-            
             let blob = new Blob([combinedText], { type: "text/plain" });
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);

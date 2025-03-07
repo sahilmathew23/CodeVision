@@ -10,8 +10,8 @@ def extract_csharp_content(file_path):
     matches = re.findall(r'```csharp(.*?)```', content, re.DOTALL)
     
     if not matches:
-        print(f"Warning: No C# code blocks found in {file_path}")
-        return ""
+        print(f"Warning: No C# code blocks found in {file_path}, using entire content")
+        return content
     
     print(f"Found {len(matches)} C# code blocks in {file_path}")
     return '\n'.join(matches).strip()

@@ -313,23 +313,30 @@ import json
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def visualize_dependencies():
+def visualize_dependencies(target=None):
     with open("code_index.json", "r", encoding="utf-8") as json_file:
         code_data = json.load(json_file)
 
     G = nx.DiGraph()
 
-    for file_path, file_data in code_data.items():  # Iterate over dictionary items
+    for file_path, file_data in code_data.items():
+        # Get just the filename without path
+        file_name = os.path.basename(file_path)
         for dep in file_data["dependencies"]:
-            G.add_edge(file_path, dep)
+            G.add_edge(file_name, dep)
 
     plt.figure(figsize=(10, 6))
     nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', font_size=8)
 
-    # Save the graph as an image
-    plt.savefig("dependencies_graph.png", dpi=300, bbox_inches='tight')
-    plt.close()  # Close the plot to prevent overlapping issues in multiple runs
+    # Create static/images directory if it doesn't exist
+    static_dir = os.path.join(os.path.dirname(__file__), 'static', 'images')
+    os.makedirs(static_dir, exist_ok=True)
 
+    # Save the graph with target name in filename under static/images
+    filename = f"dependencies_graph_{target}.png" if target else "dependencies_graph.png"
+    filepath = os.path.join(static_dir, filename)
+    plt.savefig(filepath, dpi=300, bbox_inches='tight')
+    plt.close()
 
 
 # Example Usage
@@ -360,4 +367,4 @@ if __name__ == "__main__":
         print(f"Detailed Summary: {analysis['summary']}")
 
     if not args.refact:
-        visualize_dependencies()
+        visualize_dependencies(args.target)
