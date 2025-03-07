@@ -123,40 +123,57 @@ def enhance(model_name):
         
         created_files = []
         
-        # Add debug print to see the raw output
-        print("\nDebug - Raw output:")
-        print(output[:500])  # Print first 500 chars
+        # More flexible regex pattern that handles variations in the format
+        patterns = [
+            # Pattern 1: Standard format with ```language
+            r'===== FILE: ([^\n]+?) =====\n```(?:[^\n]*)?\n(.*?)\n```(?:\n===== END FILE =====)?',
+            # Pattern 2: Format without code blocks
+            r'===== FILE: ([^\n]+?) =====\n(.*?)(?:\n===== END FILE =====|\n===== FILE:)',
+            # Pattern 3: Simple format
+            r'===== FILE: ([^\n]+?) =====\n(.*?)\n=====',
+        ]
         
-        # Split the output into individual files with improved regex
-        pattern = r'===== FILE: ([^\n]+?) =====\n```[^\n]*\n(.*?)\n```(?:\n===== END FILE =====)?'
-        matches = re.finditer(pattern, output, re.DOTALL)
+        print("\nTrying different regex patterns...")
+        
+        for pattern in patterns:
+            matches = list(re.finditer(pattern, output, re.DOTALL))
+            if matches:
+                print(f"Found {len(matches)} files using pattern: {pattern}")
+                break
+        
+        if not matches:
+            print("Error: No files found in the output. Raw output sample:")
+            print(output[:1000])
+            return
         
         for match in matches:
             filename = match.group(1).strip()
             content = match.group(2).strip()
             
-            print(f"\nDebug - Processing file: {filename}")
-            print(f"Content length: {len(content)} characters")
+            print(f"\nProcessing: {filename}")
             
-            # Remove tmp path prefix if present
-            filename = re.sub(r'^/tmp/[^/]+/', '', filename)
+            # Clean up the filename
+            filename = re.sub(r'^/tmp/[^/]+/', '', filename)  # Remove temp path
+            filename = filename.replace('\\', '/').lstrip('/')  # Normalize slashes
             
-            # Ensure the filename is sanitized and remove any invalid characters
+            # Handle case where content might still have markdown markers
+            content = re.sub(r'^```[^\n]*\n', '', content)  # Remove opening ```
+            content = re.sub(r'\n```$', '', content)        # Remove closing ```
+            
             safe_filename = os.path.normpath(filename).lstrip(os.sep)
             output_path = os.path.join(output_dir, safe_filename)
             
-            print(f"Debug - Writing to: {output_path}")
-            
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            created_files.append(output_path)
+            print(f"Writing to: {output_path}")
+            print(f"Content length: {len(content)} bytes")
             
             try:
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(content)
-                print(f"Successfully saved: {output_path}")
+                created_files.append(output_path)
+                print(f"✓ Saved: {output_path}")
             except Exception as e:
-                print(f"Error saving file {output_path}: {e}")
+                print(f"Error saving {output_path}: {e}")
         
         # Print summary of created files
         print("\nSummary of created files:")

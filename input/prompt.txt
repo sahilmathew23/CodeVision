@@ -13,11 +13,21 @@ Analyze and enhance the entire project considering:
 - **Consistent .NET coding conventions**
 
 Provide:
-1. The enhanced version of the entire project, maintaining the original file structure, create interfaces in new files, dont create any other files than interfaces
-2. Brief explanation of major architectural changes and improvements
-3. Each file should be clearly separated using the format:
-===== FILE: [filename] =====
+1. The enhanced version of the entire project, maintaining the original file structure
+2. Create interfaces in new files, don't create any other files than interfaces
+3. Brief explanation of major architectural changes and improvements
+
+Output Format Requirements:
+- Separate each file using this exact format:
+===== FILE: [filepath] =====
+```[language]
 [file content]
+```
 ===== END FILE =====
+
+- Use consistent filepath format (prefer forward slashes)
+- Each file must have the language specified in the code block (e.g. ```csharp)
+- Maintain clear separation between files
+- End each file section with the END FILE marker
 
 Focus on maintaining project cohesion while improving each component.

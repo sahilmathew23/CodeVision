@@ -92,6 +92,27 @@ def print_csproj_files(directory):
     if not found:
         print("No .csproj files found in the directory.")
 
+def copy_additional_files(dest_folder):
+    """Copy additional required files to the destination folder."""
+    additional_files = [
+        "/workspaces/CodeVision1/output/enhanced_project.txt",
+        "/workspaces/CodeVision1/output/merged_output.txt"
+    ]
+    
+    for file_path in additional_files:
+        if os.path.exists(file_path):
+            dest_file = os.path.join(dest_folder, os.path.basename(file_path))
+            shutil.copy2(file_path, dest_file)
+            print(f"Copied additional file: {dest_file}")
+            
+            # Rename merged_output.txt to raw_project.txt after copying
+            if file_path.endswith('merged_output.txt'):
+                new_name = os.path.join(dest_folder, 'raw_project.txt')
+                os.rename(dest_file, new_name)
+                print(f"Renamed {dest_file} to {new_name}")
+        else:
+            print(f"Warning: Additional file not found: {file_path}")
+
 if __name__ == "__main__":
     # Define paths
     src_folder = "/workspaces/CodeVision1/output/ClassFiles"
@@ -103,6 +124,10 @@ if __name__ == "__main__":
         # Print .csproj files before zipping
         print("\nChecking for .csproj files:")
         print_csproj_files(dest_folder)
+        
+        # Copy additional files
+        print("\nCopying additional files:")
+        copy_additional_files(dest_folder)
         
         # Create zip file
         zip_directory(dest_folder, zip_path)
